@@ -1,1 +1,1 @@
-https://asliwecki.github.io/PCA-Bias-Game/
+](https://asliwecki.github.io/PCA-Bias-Game/cognitive-bias-game.html)
