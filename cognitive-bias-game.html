@@ -145,7 +145,7 @@
         .game-content {
             flex: 1;
             display: grid;
-            grid-template-rows: 1fr 1.5fr;
+            grid-template-rows: 1fr 2fr;
             gap: 15px;
             overflow: hidden;
         }
@@ -179,70 +179,94 @@
             max-width: 90%;
         }
 
-        /* Bias Options Grid */
-        .bias-options {
+        /* Answer Choices - Multiple Choice Format */
+        .answer-choices {
             background: white;
             border-radius: 15px;
-            padding: 20px;
+            padding: 25px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 12px;
+            overflow: hidden;
         }
 
-        .bias-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-        }
-
-        .bias-btn {
+        .choice-btn {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            border: 3px solid transparent;
-            border-radius: 12px;
-            padding: 15px;
+            border: 4px solid transparent;
+            border-radius: 15px;
+            padding: 20px 25px;
             cursor: pointer;
             transition: all 0.3s ease;
             text-align: left;
-            font-size: 0.95em;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
 
-        .bias-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        .choice-btn:hover:not(.disabled) {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             border-color: #667eea;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
         }
 
-        .bias-btn.correct {
+        .choice-btn.correct {
             background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
             border-color: #4caf50;
             animation: correctPulse 0.5s ease;
             pointer-events: none;
         }
 
-        .bias-btn.incorrect {
+        .choice-btn.incorrect {
             background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
             border-color: #f44336;
             animation: shake 0.5s ease;
         }
 
-        .bias-btn.disabled {
-            opacity: 0.5;
+        .choice-btn.disabled {
             pointer-events: none;
         }
 
-        .bias-icon {
+        .choice-letter {
+            background: #667eea;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 1.5em;
-            margin-right: 8px;
+            font-weight: bold;
+            flex-shrink: 0;
         }
 
-        .bias-name {
+        .choice-btn.correct .choice-letter {
+            background: #4caf50;
+        }
+
+        .choice-btn.incorrect .choice-letter {
+            background: #f44336;
+        }
+
+        .choice-content {
+            flex: 1;
+        }
+
+        .choice-name {
             font-weight: 600;
-            color: #667eea;
+            color: #333;
+            font-size: 1.1em;
+            margin-bottom: 5px;
         }
 
-        .bias-category {
-            font-size: 0.85em;
-            color: #888;
-            margin-top: 3px;
+        .choice-category {
+            font-size: 0.9em;
+            color: #666;
+            font-style: italic;
         }
 
         /* Feedback Overlay */
@@ -380,12 +404,13 @@
     <div class="container">
         <!-- Welcome Screen -->
         <div class="welcome-screen" id="welcomeScreen">
-            <h1>🧠 AI Cognitive Bias Matcher</h1>
-            <h2>Interactive Learning Game for Counselors</h2>
-            <p><strong>Test your knowledge!</strong></p>
-            <p>Read each counseling scenario and identify which cognitive bias is at play.</p>
-            <p>Click your answer from the options below. Fast-paced and fun!</p>
-            <button class="start-btn" onclick="startGame()">🚀 Let's Play!</button>
+            <h1>🧠 AI & Cognitive Biases</h1>
+            <h2>An Interactive Learning Experience</h2>
+            <p><strong>Welcome, Counselors!</strong></p>
+            <p>Understanding our cognitive biases about AI helps us serve clients more effectively and embrace technological opportunities without fear or denial.</p>
+            <p>In this interactive game, you'll match real-world scenarios with the cognitive biases and fallacies that might be at play.</p>
+            <p><strong>Ready to challenge your thinking?</strong></p>
+            <button class="start-btn" onclick="startGame()">🚀 Start Learning</button>
         </div>
 
         <!-- Game Screen -->
@@ -408,9 +433,7 @@
                     <div class="scenario-text" id="scenarioText"></div>
                 </div>
 
-                <div class="bias-options">
-                    <div class="bias-grid" id="biasGrid"></div>
-                </div>
+                <div class="answer-choices" id="answerChoices"></div>
             </div>
         </div>
 
@@ -526,7 +549,7 @@
             totalAttempts = 0;
             
             loadQuestion();
-            renderBiasOptions();
+            renderAnswerChoices();
         }
 
         function loadQuestion() {
@@ -536,31 +559,41 @@
             updateProgress();
         }
 
-        function renderBiasOptions() {
-            const grid = document.getElementById('biasGrid');
-            const shuffledBiases = shuffleArray(allBiases);
+        function renderAnswerChoices() {
+            const currentBias = gameScenarios[currentScenarioIndex];
+            const choicesContainer = document.getElementById('answerChoices');
             
-            grid.innerHTML = shuffledBiases.map(bias => `
-                <button class="bias-btn" onclick="selectBias('${bias.name.replace(/'/g, "\\'")}')">
-                    <span class="bias-icon">${bias.icon}</span>
-                    <div>
-                        <div class="bias-name">${bias.name}</div>
-                        <div class="bias-category">${bias.category}</div>
+            // Get 3-4 random incorrect options from different categories
+            const incorrectOptions = allBiases
+                .filter(b => b.name !== currentBias.name)
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 4);
+            
+            // Combine correct answer with incorrect options and shuffle
+            const allChoices = shuffleArray([currentBias, ...incorrectOptions]);
+            const letters = ['A', 'B', 'C', 'D', 'E'];
+            
+            choicesContainer.innerHTML = allChoices.map((bias, index) => `
+                <button class="choice-btn" onclick="selectAnswer('${bias.name.replace(/'/g, "\\'")}')">
+                    <div class="choice-letter">${letters[index]}</div>
+                    <div class="choice-content">
+                        <div class="choice-name">${bias.name}</div>
+                        <div class="choice-category">${bias.category}</div>
                     </div>
                 </button>
             `).join('');
         }
 
-        function selectBias(selectedBias) {
+        function selectAnswer(selectedBias) {
             const correctBias = gameScenarios[currentScenarioIndex].name;
             const isCorrect = selectedBias === correctBias;
             
             totalAttempts++;
             
             // Find and highlight the clicked button
-            const buttons = document.querySelectorAll('.bias-btn');
+            const buttons = document.querySelectorAll('.choice-btn');
             buttons.forEach(btn => {
-                const btnName = btn.querySelector('.bias-name').textContent;
+                const btnName = btn.querySelector('.choice-name').textContent;
                 if (btnName === selectedBias) {
                     btn.classList.add(isCorrect ? 'correct' : 'incorrect');
                 }
@@ -580,7 +613,7 @@
                 currentScenarioIndex++;
                 if (currentScenarioIndex < gameScenarios.length) {
                     loadQuestion();
-                    renderBiasOptions();
+                    renderAnswerChoices();
                 } else {
                     showCompletion();
                 }
