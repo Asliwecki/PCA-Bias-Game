@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Cognitive Bias Matcher - PCA Presentation</title>
+  <title>AI Cognitive Bias Matcher - PCA Presentation (v4)</title>
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
     html,body{height:100%}
@@ -41,12 +41,13 @@
     .main{display:grid;grid-template-columns:1.2fr 1fr;gap:10px;height:calc(100% - 0px)}
 
     /* Scenario draggable */
-    .scenario.card{display:grid;grid-template-rows:auto 1fr auto;place-items:center;text-align:center}
+    .scenario.card{display:grid;grid-template-rows:auto auto 1fr auto;place-items:center;text-align:center}
     .scenario .label{color:#764ba2;font-size:.8rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
-    .dragTip{font-size:.85rem;color:#666;margin-top:10px}
+    .scenario-img{max-width:220px;border-radius:10px;margin-bottom:12px;box-shadow:0 4px 10px rgba(0,0,0,.2)}
     .dragSrc{user-select:none;cursor:grab;background:#f8f9ff;border:2px dashed #667eea;padding:16px;border-radius:12px;max-width:92%}
     .dragSrc:active{cursor:grabbing}
     .scenario .text{font-size:clamp(1rem,1.6vw,1.2rem);line-height:1.45;color:#222}
+    .dragTip{font-size:.85rem;color:#666;margin-top:10px}
 
     /* Drop targets */
     .choices.card{display:grid;grid-template-rows:auto 1fr;overflow:hidden}
@@ -99,10 +100,10 @@
           <h2>Welcome, Counselors!</h2>
           <p>Understanding our cognitive biases about AI helps us serve clients more effectively and embrace technological opportunities without fear or denial.</p>
           <p>In this interactive game, you'll match real-world scenarios with the cognitive biases and fallacies that might be at play. <strong>Drag the scenario card onto the correct fallacy name</strong> (or click a tile to select).</p>
-          <p class="small">Quick Play gives you 10 randomized rounds. Full Deck uses all 36 items.</p>
+          <p class="small">Quick Play gives you 10 randomized rounds. Full Deck uses all items in the simplified set (25).</p>
           <div class="actions">
             <button class="btn" id="startQuick">🚀 Quick Play (10)</button>
-            <button class="btn secondary" id="startFull">🧩 Full Deck (36)</button>
+            <button class="btn secondary" id="startFull">🧩 Full Deck (25)</button>
           </div>
         </div>
       </div>
@@ -120,6 +121,7 @@
       <div class="main">
         <div class="scenario card">
           <div class="label">🎭 Counseling Scenario</div>
+          <img id="sImg" class="scenario-img" alt="" />
           <div id="dragSrc" class="dragSrc" draggable="true" aria-grabbed="false">
             <div class="text" id="scenario"></div>
           </div>
@@ -154,55 +156,39 @@
       <h2 id="ficon">✓</h2>
       <p id="fmsg"></p>
       <div class="explain" id="explain"></div>
-      <div class="stay">(Closes in <span id="count">4</span>s — or press <strong>Esc</strong>, click outside, or ×)</div>
+      <div class="stay">(Closes in <span id="count">8</span>s — or press <strong>Esc</strong>, click outside, or ×)</div>
     </div>
   </div>
 
 <script>
-  // === DATASET: corrected 36 items ===
+  // === SIMPLIFIED 25-ITEM DATASET (each maps to one clear bias) ===
+  // Add images to /images and match filenames below. If missing, the image hides.
   const DATA=[
-    {name:"Status quo bias",cat:"Resistance & Denial",icon:"🔒",explain:"Preference for current state; changes feel costly or risky.",scenario:"A therapist insists on using only paper intake forms because ‘my current system works fine,’ despite clients requesting digital options and missing appointments due to paperwork delays."},
-    {name:"Minimization (defense) / Motivated reasoning",cat:"Resistance & Denial",icon:"🙈",explain:"Downplaying disconfirming evidence to protect a preferred view.",scenario:"A clinical supervisor dismisses AI-assisted note-taking as ‘just a fad’ even after three colleagues report saving 5+ hours weekly and having more energy for client care."},
-    {name:"Normalcy bias",cat:"Resistance & Denial",icon:"📅",explain:"Assuming things will keep working as they have, underestimating change.",scenario:"A counseling practice owner plans a 5-year expansion assuming AI capabilities will stay the same, ignoring monthly breakthroughs reported in professional journals."},
-    {name:"Belief perseverance / Confirmation bias",cat:"Resistance & Denial",icon:"🚫",explain:"Clinging to prior beliefs and seeking supportive evidence only.",scenario:"Before attending a workshop on AI tools, a counselor declares ‘machines can never understand emotions’ and decides the training will be useless."},
-    {name:"Rationalization (defense) / Motivated reasoning",cat:"Resistance & Denial",icon:"🎭",explain:"Constructing plausible but self-serving reasons to avoid change.",scenario:"A psychologist invokes ‘the sacred therapeutic relationship’ to avoid learning AI documentation tools, while spending 2 hours nightly on paperwork instead of self-care."},
-    {name:"Appeal to tradition (argumentum ad antiquitatem)",cat:"Resistance & Denial",icon:"📜",explain:"Claiming something is better because ‘it’s always been done that way.’",scenario:"A counselor argues against telehealth with AI scheduling because ‘therapists have always met face-to-face for 100 years.’"},
-    {name:"In-group bias + Omission bias",cat:"Resistance & Denial",icon:"🚷",explain:"Favoring one’s group; harm by inaction (failing to extend access).",scenario:"A clinic serves only affluent in-person clients, refusing AI-enhanced teletherapy that could reach underserved rural communities."},
-
-    {name:"Catastrophizing + All-or-nothing thinking",cat:"Fear & Threat",icon:"💥",explain:"Exaggerating worst outcomes; seeing only extremes.",scenario:"Hearing about AI chatbots, a counselor concludes ‘this is the end of our profession’ and refuses to explore assistive uses."},
-    {name:"Ambiguity aversion + Affect heuristic",cat:"Fear & Threat",icon:"😰",explain:"Avoiding unfamiliar options; feelings drive risk judgment.",scenario:"A therapist who has never tried AI tools fears ‘robots taking over,’ but calms after a 20-minute transcription demo."},
-    {name:"Identity-protective cognition",cat:"Fear & Threat",icon:"🛡️",explain:"Rejecting information to protect status/identity within a group.",scenario:"When AI diagnostic support appears, a senior therapist argues ‘using tech shows we’re not real clinicians,’ defending their expert identity."},
-    {name:"Availability cascade + Negativity bias",cat:"Fear & Threat",icon:"☠️",explain:"Repetition and negative content feel more true/likely.",scenario:"A counselor fixates on articles predicting ‘AI will eliminate all therapy jobs by 2030,’ doom-checking daily instead of learning adaptive skills."},
-    {name:"Ambiguity aversion (fear of the unknown)",cat:"Fear & Threat",icon:"❓",explain:"Preferring known risks to unknown ones.",scenario:"A therapist avoids reading about AI mental-health tools because unfamiliarity is anxiety-provoking, despite client needs."},
-
-    {name:"Availability heuristic",cat:"Information Processing",icon:"📰",explain:"Judging risk/frequency by what comes easily to mind.",scenario:"After one viral story about a harmful chatbot, a counselor assumes all AI tools are dangerous, ignoring many successful implementations."},
-    {name:"Confirmation bias",cat:"Information Processing",icon:"🔍",explain:"Seeking/valuing evidence that confirms prior views.",scenario:"A therapist skeptical of AI only reads critical articles and ignores peer‑reviewed studies showing benefits of AI-assisted interventions."},
-    {name:"Cognitive dissonance",cat:"Information Processing",icon:"😵",explain:"Discomfort from conflicting beliefs/behaviors prompts defensiveness.",scenario:"A counselor saying ‘AI has no place in therapy’ feels discomfort when their favorite CE platform personalizes with AI and becomes defensive."},
-    {name:"Need for cognitive closure",cat:"Information Processing",icon:"🚪",explain:"Desire for quick, definite answers; discomfort with nuance.",scenario:"Asked about AI in counseling, a therapist insists ‘it’s good or bad—I must decide now,’ avoiding open-ended inquiry."},
-    {name:"Intolerance of uncertainty (IU)",cat:"Information Processing",icon:"⚖️",explain:"Difficulty acting amid reasonable uncertainty.",scenario:"A supervisor demands absolute certainty about AI’s impact before piloting anything."},
-    {name:"Red herring (irrelevant thesis)",cat:"Information Processing",icon:"🐟",explain:"Diverting to an irrelevant issue to avoid the point.",scenario:"During AI scheduling planning, a therapist derails into debates about ‘true consciousness.’"},
-    {name:"Focusing illusion (salience bias)",cat:"Information Processing",icon:"🔬",explain:"Overweighting one salient aspect; neglecting the rest.",scenario:"A counselor fixates on AI’s lack of empathy while ignoring that admin tools could free 10 hours weekly for empathic contact."},
-
-    {name:"Status quo bias + Omission bias",cat:"Decision-Making & Agency",icon:"🤷",explain:"Defaulting to inaction; harm from not trying a low‑risk test.",scenario:"A therapy group debates AI transcription for six months without running a simple 2‑week pilot to get data."},
-    {name:"Sunk-cost fallacy (escalation of commitment)",cat:"Decision-Making & Agency",icon:"💸",explain:"Continuing a poor option due to past investment.",scenario:"A counselor keeps an outdated system because ‘I invested so much time learning it,’ despite better AI‑enhanced alternatives."},
-    {name:"False dichotomy (either–or fallacy)",cat:"Decision-Making & Agency",icon:"⚡",explain:"Forcing a binary choice; ignoring middle options.",scenario:"‘Either embrace AI completely and lose humanity, or reject it entirely’—ignoring selective, ethical integration."},
-
-    {name:"Belief perseverance + Self‑enhancement bias",cat:"Existential & Identity",icon:"🌊",explain:"Holding identity‑affirming beliefs despite new evidence.",scenario:"A seasoned therapist feels disoriented that AI drafts summaries as well as they can and struggles to reconcile this with self‑image."},
-    {name:"Cognitive dissonance (belief updating)",cat:"Existential & Identity",icon:"🧩",explain:"Adjusting beliefs after disconfirming experience.",scenario:"After AI increases client face‑time, a counselor revises ‘tech depersonalizes care,’ with temporary discomfort."},
-    {name:"System‑justification + Human exceptionalism bias",cat:"Existential & Identity",icon:"👤",explain:"Defending status quo; assuming human superiority by default.",scenario:"‘Humans are inherently better at therapy’ is used for comfort even when some AI‑supported outcomes match or exceed."},
-    {name:"Anthropocentrism",cat:"Existential & Identity",icon:"🧑",explain:"Centering humans; discounting nonhuman tools’ contributions.",scenario:"A counselor dismisses AI mood tracking because ‘only humans understand emotions,’ ignoring complementary pattern recognition."},
-    {name:"Loss aversion + Zero‑sum bias",cat:"Existential & Identity",icon:"💼",explain:"Overweighting losses; seeing gains as others’ losses.",scenario:"A newly licensed therapist worries ‘AI makes my degree worthless’ instead of exploring complementary skills."},
-
-    {name:"Negativity bias + Availability cascade",cat:"Emotion & Media",icon:"📉",explain:"Preferentially attending to repeated negative content.",scenario:"A therapist binge‑watches ‘AI will destroy care’ videos, fueling anxiety instead of learning."},
-    {name:"Anthropomorphism (anthropomorphic bias)",cat:"Emotion & Media",icon:"🤖",explain:"Ascribing human motives/feelings to a tool.",scenario:"A counselor says ‘the AI is trying to replace us,’ as if it has intentions."},
-    {name:"Automation bias",cat:"Emotion & Media",icon:"✨",explain:"Over‑trusting automated outputs over human judgment.",scenario:"A therapist prefers AI advice over peer consultation because ‘AI never judges my questions.’"},
-    {name:"Projection (defense mechanism)",cat:"Emotion & Media",icon:"🪞",explain:"Attributing one’s own feelings to others.",scenario:"A counselor fearing inadequacy accuses AI‑using colleagues of ‘cheating’ and being threatened."},
-
-    {name:"Illusory pattern perception (apophenia) + Conspiracy mentality",cat:"Extreme / Pathological",icon:"🕵️",explain:"Seeing deliberate patterns/plots where none exist.",scenario:"A therapist believes tech firms are ‘secretly programming AI to destroy counseling’ and finds ‘evidence’ in each announcement."},
-    {name:"Magical thinking (cognitive distortion)",cat:"Extreme / Pathological",icon:"✨",explain:"Believing thoughts/objects have supernatural causal power.",scenario:"A counselor believes AI can read minds and predict the future, leading to unrealistic fear or hype."},
-    {name:"Confirmation bias + Echo‑chamber effect",cat:"Extreme / Pathological",icon:"🌀",explain:"Self‑reinforcing information loops amplify prior beliefs.",scenario:"A therapist spends hours getting AI to validate detached theories, isolating from clinical reality and feedback."},
-    {name:"Illusory superiority (Dunning–Kruger‑adjacent)",cat:"Extreme / Pathological",icon:"👑",explain:"Overestimating one’s specialness/ability relative to others.",scenario:"A counselor believes AI has ‘chosen’ them for unique insights above ‘ordinary’ colleagues."},
-    {name:"Echo‑chamber effect + Group polarization",cat:"Extreme / Pathological",icon:"🏝️",explain:"Withdrawing into like‑minded groups increases extremity.",scenario:"A therapist stops attending supervision, convinced only AI understands their ‘revolutionary’ views."}
+    {name:"Status Quo Bias",cat:"Resistance",icon:"🔒",img:"status-quo.jpg",explain:"Preferring the current method even when alternatives improve outcomes.",scenario:"A therapist insists on using only paper intake forms because ‘my current system works fine,’ despite clients requesting digital options and missing appointments due to paperwork delays."},
+    {name:"Minimization",cat:"Defense",icon:"🙈",img:"minimization.jpg",explain:"Downplaying evidence that contradicts one’s stance.",scenario:"A clinical supervisor dismisses AI-assisted note-taking as ‘just a fad’ even after colleagues report saving hours and having more energy for client care."},
+    {name:"Normalcy Bias",cat:"Resistance",icon:"📅",img:"normalcy-bias.jpg",explain:"Assuming the future will resemble the past; underestimating change.",scenario:"A practice owner plans a 5‑year expansion assuming AI capabilities will stay the same, ignoring ongoing breakthroughs."},
+    {name:"Confirmation Bias",cat:"Reasoning",icon:"🔍",img:"confirmation-bias.jpg",explain:"Seeking or favoring information that confirms prior beliefs.",scenario:"Before an AI workshop, a counselor declares ‘machines can’t understand emotions’ and pre‑judges the training as useless."},
+    {name:"Rationalization",cat:"Defense",icon:"🎭",img:"rationalization.jpg",explain:"Inventing plausible reasons to justify avoidance.",scenario:"A psychologist invokes ‘the sacred therapeutic relationship’ to avoid AI documentation tools, while spending 2 hours nightly on paperwork."},
+    {name:"Appeal to Tradition",cat:"Fallacy",icon:"📜",img:"appeal-to-tradition.jpg",explain:"Arguing something is better because it’s customary.",scenario:"A counselor resists telehealth with AI scheduling because ‘therapists have always met face‑to‑face.’"},
+    {name:"In‑group Bias",cat:"Fairness",icon:"👥",img:"ingroup-bias.jpg",explain:"Favoring one’s own group at others’ expense.",scenario:"A clinic serves only affluent in‑person clients, refusing AI‑enhanced teletherapy that could reach rural communities."},
+    {name:"Catastrophizing",cat:"Distortion",icon:"💥",img:"catastrophizing.jpg",explain:"Leaping to worst‑case outcomes.",scenario:"Hearing about AI chatbots, a counselor concludes ‘this is the end of our profession’ and won’t explore assistive uses."},
+    {name:"Ambiguity Aversion",cat:"Risk",icon:"😰",img:"ambiguity-aversion.jpg",explain:"Avoiding unfamiliar options; uncertainty feels threatening.",scenario:"A therapist who has never tried AI tools fears ‘robots taking over’ but calms after a 20‑minute demo."},
+    {name:"Identity Threat",cat:"Social",icon:"🛡️",img:"identity-threat.jpg",explain:"Resisting change perceived to diminish one’s status/role.",scenario:"When AI diagnostic support appears, a senior therapist claims ‘using tech means we’re not real clinicians.’"},
+    {name:"Negativity Bias",cat:"Attention",icon:"📉",img:"negativity-bias.jpg",explain:"Giving more weight to negative information.",scenario:"A counselor fixates on ‘AI will eliminate therapy jobs’ headlines and doom‑checks daily instead of learning adaptive skills."},
+    {name:"Availability Heuristic",cat:"Judgment",icon:"📰",img:"availability-heuristic.jpg",explain:"Judging frequency/risk by what’s easy to recall.",scenario:"After one viral story about a harmful chatbot, a counselor assumes all AI tools are dangerous."},
+    {name:"Cognitive Dissonance",cat:"Conflict",icon:"😵",img:"cognitive-dissonance.jpg",explain:"Discomfort from clashing beliefs or behaviors.",scenario:"A counselor who says ‘AI has no place in therapy’ feels discomfort when their CE platform personalizes with AI."},
+    {name:"Need for Closure",cat:"Motivation",icon:"🚪",img:"need-for-closure.jpg",explain:"Preference for quick, definite answers; low tolerance for nuance.",scenario:"Asked about AI in counseling, a therapist insists ‘it’s either good or bad—I must decide now.’"},
+    {name:"Intolerance of Uncertainty",cat:"Risk",icon:"⚖️",img:"intolerance-uncertainty.jpg",explain:"Difficulty acting amid reasonable unknowns.",scenario:"A supervisor demands absolute certainty about AI’s impact before piloting anything."},
+    {name:"Red Herring",cat:"Fallacy",icon:"🐟",img:"red-herring.jpg",explain:"Shifting to an irrelevant topic to avoid the issue.",scenario:"During AI scheduling planning, a therapist derails into debates about ‘true consciousness.’"},
+    {name:"Sunk Cost Fallacy",cat:"Decision",icon:"💸",img:"sunk-cost.jpg",explain:"Continuing a poor option due to past investment.",scenario:"A counselor keeps an outdated system because ‘I invested so much time learning it,’ despite better alternatives."},
+    {name:"False Dichotomy",cat:"Fallacy",icon:"⚡",img:"false-dichotomy.jpg",explain:"Framing choices as either/or while ignoring middle paths.",scenario:"‘Either embrace AI completely and lose humanity, or reject it entirely’—ignoring selective, ethical integration."},
+    {name:"Loss Aversion",cat:"Decision",icon:"📉",img:"loss-aversion.jpg",explain:"Weighing potential losses more than gains.",scenario:"A newly licensed therapist worries ‘AI will make my degree worthless’ instead of exploring complementary skills."},
+    {name:"Anthropomorphism",cat:"Attribution",icon:"🤖",img:"anthropomorphism.jpg",explain:"Ascribing human motives/feelings to tools.",scenario:"A counselor says ‘the AI is trying to replace us,’ as if it has intentions."},
+    {name:"Automation Bias",cat:"Trust",icon:"✨",img:"automation-bias.jpg",explain:"Over‑relying on automated output over human judgment.",scenario:"A therapist prefers AI advice over peer consultation because ‘AI never judges my questions.’"},
+    {name:"Projection",cat:"Defense",icon:"🪞",img:"projection.jpg",explain:"Attributing one’s own feelings to others.",scenario:"A counselor fearing inadequacy accuses AI‑using colleagues of ‘cheating’ and being threatened."},
+    {name:"Magical Thinking",cat:"Distortion",icon:"✨",img:"magical-thinking.jpg",explain:"Believing in mystical causal powers.",scenario:"A counselor believes AI can read minds and predict the future, fueling unrealistic fear or hype."},
+    {name:"Illusory Pattern",cat:"Perception",icon:"🕵️",img:"illusory-pattern.jpg",explain:"Seeing patterns/plots where none exist.",scenario:"A therapist believes tech firms are secretly programming AI to destroy counseling and finds ‘evidence’ in each announcement."},
+    {name:"Echo Chamber Effect",cat:"Social",icon:"🏝️",img:"echo-chamber.jpg",explain:"Staying in like‑minded circles that amplify beliefs.",scenario:"A therapist stops attending supervision, convinced only AI understands their ‘revolutionary’ views."}
   ];
 
   // State & helpers
@@ -223,7 +209,19 @@
   function renderQuestion(){
     const item=state.deck[state.qIndex];
     state.current=item;
-    $('#scenario').textContent=item.scenario;
+
+    // Image handling
+    const imgEl = document.getElementById('sImg');
+    if(item.img){
+      imgEl.src = 'images/' + item.img;
+      imgEl.alt = item.name + ' illustration';
+      imgEl.style.display = 'block';
+      imgEl.onerror = ()=> { imgEl.style.display='none'; };
+    } else {
+      imgEl.style.display = 'none';
+    }
+
+    document.getElementById('scenario').textContent=item.scenario;
     updateProgress();
 
     // Build 5 tiles: 1 correct + 4 distractors
@@ -231,7 +229,7 @@
     const distractors=shuffle(pool).slice(0,4);
     const opts=shuffle([item,...distractors]);
     const letters=['A','B','C','D','E'];
-    $('#targets').innerHTML=opts.map((o,i)=>`
+    document.getElementById('targets').innerHTML=opts.map((o,i)=>`
       <div class="tile" tabindex="0" role="button" aria-label="${o.name}" data-name="${o.name.replace(/"/g,'&quot;')}">
         <div class="letter">${letters[i]}</div>
         <div>
@@ -241,7 +239,7 @@
       </div>`).join('');
 
     // Drag & drop wiring
-    const src=$('#dragSrc');
+    const src=document.getElementById('dragSrc');
     src.setAttribute('draggable','true');
     src.addEventListener('dragstart',e=>{ e.dataTransfer.setData('text/plain', 'scenario'); src.setAttribute('aria-grabbed','true'); });
     src.addEventListener('dragend',()=> src.setAttribute('aria-grabbed','false'));
@@ -283,14 +281,14 @@
   }
 
   function updateHUD(){
-    $('#score').textContent=state.score;
+    document.getElementById('score').textContent=state.score;
     const acc=state.attempts?Math.round((state.score/state.attempts)*100):0;
-    $('#acc').textContent=acc+'%';
+    document.getElementById('acc').textContent=acc+'%';
   }
 
   function updateProgress(){
     const pct=Math.round(((state.qIndex+1)/state.total)*100);
-    const bar=$('#bar');bar.style.width=pct+'%';bar.textContent=`Question ${state.qIndex+1} of ${state.total}`;
+    const bar=document.getElementById('bar');bar.style.width=pct+'%';bar.textContent=`Question ${state.qIndex+1} of ${state.total}`;
   }
 
   function next(){
@@ -299,21 +297,21 @@
   }
 
   function finish(){
-    $('#game').style.display='none';
-    $('#done').style.display='grid';
-    $('#finalScore').textContent=`${state.score}/${state.total}`;
+    document.getElementById('game').style.display='none';
+    document.getElementById('done').style.display='grid';
+    document.getElementById('finalScore').textContent=`${state.score}/${state.total}`;
     const acc=state.attempts?Math.round((state.score/state.attempts)*100):0;
-    $('#finalAcc').textContent=acc+'%';
+    document.getElementById('finalAcc').textContent=acc+'%';
   }
 
-  // Feedback overlay with manual close and countdown
-  const AUTO_CLOSE_MS=4500;
+  // Feedback overlay with manual close and 8s countdown
+  const AUTO_CLOSE_MS=8000; // 8 seconds
   function showFeedback(ok,msg,explain){
     return new Promise(resolve=>{
-      const o=$('#overlay'), box=$('#fbox'), close=$('#closex'), count=$('#count');
+      const o=document.getElementById('overlay'), box=document.getElementById('fbox'), close=document.getElementById('closex'), count=document.getElementById('count');
       box.className='fbox '+(ok?'correct':'incorrect');
-      $('#ficon').textContent=ok?'✓':'✗';
-      $('#fmsg').textContent=msg; $('#explain').textContent=explain||'';
+      document.getElementById('ficon').textContent=ok?'✓':'✗';
+      document.getElementById('fmsg').textContent=msg; document.getElementById('explain').textContent=explain||'';
       let remaining = Math.floor(AUTO_CLOSE_MS/1000); count.textContent=remaining;
       o.classList.add('show');
       const tick=setInterval(()=>{ remaining--; if(remaining>=0) count.textContent=remaining; },1000);
@@ -328,7 +326,7 @@
 
   // wire buttons
   document.getElementById('startQuick').addEventListener('click',()=>startGame(10));
-  document.getElementById('startFull').addEventListener('click',()=>startGame(36));
+  document.getElementById('startFull').addEventListener('click',()=>startGame(DATA.length));
   document.getElementById('playAgain').addEventListener('click',()=>document.location.reload());
 </script>
 </body>
