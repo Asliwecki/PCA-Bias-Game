@@ -19,10 +19,10 @@
 
     /* Welcome */
     .welcome{height:100%;display:grid;place-items:center}
-    .welcome-inner{max-width:980px;text-align:center}
-    .welcome h1{font-size:clamp(1.6rem,3.2vw,2.6rem);color:#fff;text-shadow:0 2px 16px rgba(0,0,0,.25);margin-bottom:14px}
+    .welcome-inner{max-width:980px}
+    .welcome h1{font-size:clamp(1.6rem,3.2vw,2.6rem);color:#fff;text-shadow:0 2px 16px rgba(0,0,0,.25);margin-bottom:14px;text-align:center}
     .welcome .card h2{color:#667eea;font-size:1.4rem;margin-bottom:6px}
-    .welcome .card p{color:#555;line-height:1.5;font-size:1rem;margin:8px auto;max-width:760px}
+    .welcome .card p{color:#555;line-height:1.55;font-size:1rem;margin:10px auto;max-width:860px}
     .actions{display:flex;gap:12px;justify-content:center;margin-top:18px;flex-wrap:wrap}
     .btn{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border:0;border-radius:999px;padding:14px 22px;font-size:1rem;cursor:pointer;box-shadow:0 10px 24px rgba(102,126,234,.45);transition:transform .18s ease,box-shadow .18s ease}
     .btn:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(102,126,234,.6)}
@@ -39,21 +39,27 @@
     .progress{background:#ffffff55;border-radius:8px;overflow:hidden;height:10px}
     .bar{height:100%;width:0;background:linear-gradient(90deg,#4caf50 0%,#8bc34a 100%);color:#fff;font-size:.7rem;line-height:10px;text-align:center;transition:width .45s ease}
     .main{display:grid;grid-template-columns:1.2fr 1fr;gap:10px;height:calc(100% - 0px)}
-    .scenario.card{display:grid;grid-template-rows:auto 1fr;place-items:center;text-align:center}
+
+    /* Scenario draggable */
+    .scenario.card{display:grid;grid-template-rows:auto 1fr auto;place-items:center;text-align:center}
     .scenario .label{color:#764ba2;font-size:.8rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
-    .scenario .text{font-size:clamp(1rem,1.6vw,1.2rem);line-height:1.4;color:#222;max-width:90%}
-    .choices.card{display:grid;align-content:center;gap:8px;overflow:hidden}
-    .choice{display:flex;align-items:center;gap:14px;text-align:left;border-radius:12px;border:3px solid transparent;background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);padding:12px 14px;cursor:pointer;transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease}
-    .choice:hover:not(.disabled){transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.2);border-color:#667eea;background:linear-gradient(135deg,#e3f2fd 0%,#bbdefb 100%)}
-    .choice.disabled{pointer-events:none;opacity:.92}
-    .choice.correct{background:linear-gradient(135deg,#84fab0 0%,#8fd3f4 100%);border-color:#2e7d32;animation:correctPulse .4s ease}
-    .choice.incorrect{background:linear-gradient(135deg,#ff9a9e 0%,#fecfef 100%);border-color:#c62828;animation:shake .45s ease}
-    .letter{background:#667eea;color:#fff;width:34px;height:34px;display:grid;place-items:center;border-radius:999px;font-weight:800;flex-shrink:0}
-    .choice.correct .letter{background:#2e7d32}
-    .choice.incorrect .letter{background:#c62828}
-    .cmeta{flex:1}
-    .cname{font-weight:700;color:#222;font-size:.98rem}
-    .ccat{font-size:.8rem;color:#555;font-style:italic}
+    .dragTip{font-size:.85rem;color:#666;margin-top:10px}
+    .dragSrc{user-select:none;cursor:grab;background:#f8f9ff;border:2px dashed #667eea;padding:16px;border-radius:12px;max-width:92%}
+    .dragSrc:active{cursor:grabbing}
+    .scenario .text{font-size:clamp(1rem,1.6vw,1.2rem);line-height:1.45;color:#222}
+
+    /* Drop targets */
+    .choices.card{display:grid;grid-template-rows:auto 1fr;overflow:hidden}
+    .choices h3{color:#667eea;margin-bottom:6px}
+    .targets{display:grid;grid-template-columns:1fr;gap:8px;align-content:center}
+    .tile{display:flex;align-items:center;gap:12px;border-radius:12px;border:3px solid transparent;background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);padding:12px 14px;transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease}
+    .tile:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.2);border-color:#667eea;background:linear-gradient(135deg,#e3f2fd 0%,#bbdefb 100%)}
+    .tile .letter{background:#667eea;color:#fff;width:34px;height:34px;display:grid;place-items:center;border-radius:999px;font-weight:800;flex-shrink:0}
+    .tile.correct{background:linear-gradient(135deg,#84fab0 0%,#8fd3f4 100%);border-color:#2e7d32}
+    .tile.incorrect{background:linear-gradient(135deg,#ff9a9e 0%,#fecfef 100%);border-color:#c62828}
+    .tname{font-weight:700;color:#222;font-size:.98rem}
+    .tcat{font-size:.8rem;color:#555;font-style:italic}
+    .small{font-size:.78rem;color:#666}
 
     /* Overlay */
     .overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:999;animation:fadeIn .2s ease}
@@ -64,7 +70,7 @@
     .fbox.incorrect h2{color:#c62828}
     .fbox p{color:#444;font-size:1.05rem}
     .explain{margin-top:10px;color:#333;font-size:.98rem}
-    .closex{position:absolute;top:10px;right:10px;border:none;background:#eef; color:#4b57d6; width:34px;height:34px;border-radius:50%;font-weight:800;cursor:pointer}
+    .closex{position:absolute;top:10px;right:10px;border:none;background:#eef;color:#4b57d6;width:34px;height:34px;border-radius:50%;font-weight:800;cursor:pointer}
     .closex:hover{filter:brightness(.95)}
     .stay{margin-top:12px;font-size:.85rem;color:#666}
 
@@ -79,10 +85,9 @@
     /* Animations */
     @keyframes fadeIn{from{opacity:0}to{opacity:1}}
     @keyframes scaleIn{from{transform:scale(.88)}to{transform:scale(1)}}
-    @keyframes correctPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
-    @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
 
-    @media (max-width:900px){.main{grid-template-columns:1fr;grid-template-rows:1fr 1fr}.scenario .text{max-width:96%}}
+    @media (max-width:900px){.main{grid-template-columns:1fr;grid-template-rows:1fr 1fr}.scenario .text{max-width:96%}.targets{grid-template-columns:1fr}}
+    @media (min-width:901px){.targets{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
@@ -91,8 +96,10 @@
       <div class="welcome-inner">
         <h1>🧠 AI & Cognitive Biases — Interactive Matcher</h1>
         <div class="card">
-          <h2>Welcome, Counselors</h2>
-          <p>Match each real counseling scenario to the correct bias / fallacy (or standard defense mechanism). Learn fast, have fun, and keep it all on one screen—no scrolling.</p>
+          <h2>Welcome, Counselors!</h2>
+          <p>Understanding our cognitive biases about AI helps us serve clients more effectively and embrace technological opportunities without fear or denial.</p>
+          <p>In this interactive game, you'll match real-world scenarios with the cognitive biases and fallacies that might be at play. <strong>Drag the scenario card onto the correct fallacy name</strong> (or click a tile to select).</p>
+          <p class="small">Quick Play gives you 10 randomized rounds. Full Deck uses all 36 items.</p>
           <div class="actions">
             <button class="btn" id="startQuick">🚀 Quick Play (10)</button>
             <button class="btn secondary" id="startFull">🧩 Full Deck (36)</button>
@@ -113,9 +120,15 @@
       <div class="main">
         <div class="scenario card">
           <div class="label">🎭 Counseling Scenario</div>
-          <div class="text" id="scenario"></div>
+          <div id="dragSrc" class="dragSrc" draggable="true" aria-grabbed="false">
+            <div class="text" id="scenario"></div>
+          </div>
+          <div class="dragTip">Drag this card onto a fallacy tile →</div>
         </div>
-        <div class="choices card" id="choices"></div>
+        <div class="choices card">
+          <h3>Drop onto the correct fallacy</h3>
+          <div class="targets" id="targets"></div>
+        </div>
       </div>
     </section>
 
@@ -134,7 +147,7 @@
     </section>
   </div>
 
-  <!-- Feedback overlay with manual close (X) and ESC support -->
+  <!-- Feedback overlay with manual close (X) and ESC support + countdown -->
   <div class="overlay" id="overlay" aria-modal="true" role="dialog">
     <div class="fbox" id="fbox">
       <button class="closex" id="closex" aria-label="Close feedback">×</button>
@@ -192,9 +205,10 @@
     {name:"Echo‑chamber effect + Group polarization",cat:"Extreme / Pathological",icon:"🏝️",explain:"Withdrawing into like‑minded groups increases extremity.",scenario:"A therapist stops attending supervision, convinced only AI understands their ‘revolutionary’ views."}
   ];
 
+  // State & helpers
   const $=s=>document.querySelector(s);
   const shuffle=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);
-  const state={deck:[],qIndex:0,score:0,attempts:0,total:0};
+  const state={deck:[],qIndex:0,score:0,attempts:0,total:0,current:null};
 
   function startGame(n){
     $('#welcome').style.display='none';
@@ -208,31 +222,62 @@
 
   function renderQuestion(){
     const item=state.deck[state.qIndex];
+    state.current=item;
     $('#scenario').textContent=item.scenario;
     updateProgress();
+
+    // Build 5 tiles: 1 correct + 4 distractors
     const pool=DATA.filter(x=>x.name!==item.name);
     const distractors=shuffle(pool).slice(0,4);
     const opts=shuffle([item,...distractors]);
     const letters=['A','B','C','D','E'];
-    $('#choices').innerHTML=opts.map((o,i)=>`
-      <button class="choice" data-name="${o.name.replace(/"/g,'&quot;')}" aria-label="${o.name}">
+    $('#targets').innerHTML=opts.map((o,i)=>`
+      <div class="tile" tabindex="0" role="button" aria-label="${o.name}" data-name="${o.name.replace(/"/g,'&quot;')}">
         <div class="letter">${letters[i]}</div>
-        <div class="cmeta">
-          <div class="cname">${o.icon||''} ${o.name}</div>
-          <div class="ccat">${o.cat}</div>
+        <div>
+          <div class="tname">${o.icon||''} ${o.name}</div>
+          <div class="tcat">${o.cat}</div>
         </div>
-      </button>`).join('');
-    document.querySelectorAll('.choice').forEach(btn=>btn.addEventListener('click',()=>select(btn,item)));
-    window.onkeydown=e=>{if(['1','2','3','4','5'].includes(e.key)){const idx=parseInt(e.key,10)-1;const t=document.querySelectorAll('.choice')[idx];if(t)t.click();}};
+      </div>`).join('');
+
+    // Drag & drop wiring
+    const src=$('#dragSrc');
+    src.setAttribute('draggable','true');
+    src.addEventListener('dragstart',e=>{ e.dataTransfer.setData('text/plain', 'scenario'); src.setAttribute('aria-grabbed','true'); });
+    src.addEventListener('dragend',()=> src.setAttribute('aria-grabbed','false'));
+
+    document.querySelectorAll('.tile').forEach(tile=>{
+      tile.addEventListener('dragover',e=>{ e.preventDefault(); tile.style.borderColor='#667eea'; });
+      tile.addEventListener('dragleave',()=>{ tile.style.borderColor='transparent'; });
+      tile.addEventListener('drop',e=>{ e.preventDefault(); tile.style.borderColor='transparent'; handleChoice(tile.getAttribute('data-name')); });
+      // Click/keyboard fallback
+      tile.addEventListener('click',()=> handleChoice(tile.getAttribute('data-name')));
+      tile.addEventListener('keydown',e=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); handleChoice(tile.getAttribute('data-name')); }});
+    });
+
+    // Keyboard shortcuts 1-5
+    window.onkeydown=e=>{
+      if(['1','2','3','4','5'].includes(e.key)){
+        const idx=parseInt(e.key,10)-1; const t=document.querySelectorAll('.tile')[idx]; if(t) handleChoice(t.getAttribute('data-name'));
+      }
+    };
   }
 
-  async function select(btn,correct){
-    const selected=btn.getAttribute('data-name');
-    const ok=selected===correct.name;
+  async function handleChoice(name){
+    const correct=state.current;
+    const ok = name===correct.name;
     state.attempts++;
-    document.querySelectorAll('.choice').forEach(b=>b.classList.add('disabled'));
-    btn.classList.add(ok?'correct':'incorrect');
-    if(ok){state.score++; await showFeedback(true,`Correct — ${correct.name}`,correct.explain);} else {await showFeedback(false,`Not quite. Answer: ${correct.name}`,correct.explain);} 
+
+    // visual mark on tiles
+    document.querySelectorAll('.tile').forEach(t=>{
+      const isSel = t.getAttribute('data-name')===name;
+      if(isSel) t.classList.add(ok? 'correct':'incorrect');
+      t.style.pointerEvents='none';
+    });
+
+    if(ok){ state.score++; await showFeedback(true,`Correct — ${correct.name}`,correct.explain); }
+    else { await showFeedback(false,`Not quite. Answer: ${correct.name}`,correct.explain); }
+
     updateHUD();
     next();
   }
@@ -261,43 +306,27 @@
     $('#finalAcc').textContent=acc+'%';
   }
 
-  // --- Improved feedback: manual close (X, outside click, Esc) + longer timer with countdown ---
-  const AUTO_CLOSE_MS=4500; // adjust this to taste
-
+  // Feedback overlay with manual close and countdown
+  const AUTO_CLOSE_MS=4500;
   function showFeedback(ok,msg,explain){
     return new Promise(resolve=>{
       const o=$('#overlay'), box=$('#fbox'), close=$('#closex'), count=$('#count');
       box.className='fbox '+(ok?'correct':'incorrect');
       $('#ficon').textContent=ok?'✓':'✗';
       $('#fmsg').textContent=msg; $('#explain').textContent=explain||'';
-      let remaining = Math.floor(AUTO_CLOSE_MS/1000);
-      count.textContent = remaining;
+      let remaining = Math.floor(AUTO_CLOSE_MS/1000); count.textContent=remaining;
       o.classList.add('show');
-
-      // countdown
-      const tick = setInterval(()=>{ remaining--; if(remaining>=0){count.textContent=remaining;} },1000);
-
-      const cleanup=()=>{
-        clearInterval(tick);
-        o.classList.remove('show');
-        o.removeEventListener('click',onOutside);
-        close.removeEventListener('click',onClose);
-        document.removeEventListener('keydown',onEsc);
-        clearTimeout(timer);
-        resolve();
-      };
-      const onOutside=e=>{ if(e.target===o) cleanup(); };
+      const tick=setInterval(()=>{ remaining--; if(remaining>=0) count.textContent=remaining; },1000);
+      const cleanup=()=>{ clearInterval(tick); o.classList.remove('show'); o.removeEventListener('click',outside); close.removeEventListener('click',onClose); document.removeEventListener('keydown',onEsc); clearTimeout(timer); resolve(); };
+      const outside=e=>{ if(e.target===o) cleanup(); };
       const onClose=()=>cleanup();
       const onEsc=e=>{ if(e.key==='Escape') cleanup(); };
-      o.addEventListener('click',onOutside);
-      close.addEventListener('click',onClose);
-      document.addEventListener('keydown',onEsc);
-
+      o.addEventListener('click',outside); close.addEventListener('click',onClose); document.addEventListener('keydown',onEsc);
       const timer=setTimeout(()=>cleanup(),AUTO_CLOSE_MS);
     });
   }
 
-  // wire
+  // wire buttons
   document.getElementById('startQuick').addEventListener('click',()=>startGame(10));
   document.getElementById('startFull').addEventListener('click',()=>startGame(36));
   document.getElementById('playAgain').addEventListener('click',()=>document.location.reload());
