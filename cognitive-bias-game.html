@@ -5,112 +5,94 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Cognitive Bias Matcher - PCA Presentation</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      background: radial-gradient(1200px 800px at 10% 10%, #7aa2ff33, transparent 60%),
-                  radial-gradient(1000px 700px at 90% 20%, #e7b6ff33, transparent 60%),
-                  linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: #222;
-      height: 100vh;
-      overflow: hidden; /* no scroll */
-      display: flex; align-items: center; justify-content: center; padding: 10px;
+    *{margin:0;padding:0;box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
+      background:radial-gradient(1200px 800px at 10% 10%,#7aa2ff33,transparent 60%),
+                 radial-gradient(1000px 700px at 90% 20%,#e7b6ff33,transparent 60%),
+                 linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      color:#222;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:10px
     }
-
-    .container { width: 98vw; height: 98vh; display: flex; flex-direction: column; }
-
-    /* Card primitives */
-    .card {
-      background: #fff; border-radius: 16px; box-shadow: 0 12px 40px rgba(0,0,0,.18);
-      padding: 24px; animation: fadeIn .4s ease;
-    }
+    .container{width:98vw;height:98vh;display:flex;flex-direction:column}
+    .card{background:#fff;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.18);padding:24px;animation:fadeIn .4s ease}
 
     /* Welcome */
-    .welcome { height: 100%; display: grid; place-items: center; }
-    .welcome-inner { max-width: 980px; text-align: center; }
-    .welcome h1 { font-size: clamp(1.6rem, 3.2vw, 2.6rem); color: #fff; text-shadow: 0 2px 16px rgba(0,0,0,.25); margin-bottom: 14px; }
-    .welcome .card h2 { color: #667eea; font-size: 1.4rem; margin-bottom: 6px; }
-    .welcome .card p { color: #555; line-height: 1.5; font-size: 1rem; margin: 8px auto; max-width: 760px; }
-    .actions { display: flex; gap: 12px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
-    .btn {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: #fff; border: 0; border-radius: 999px; padding: 14px 22px; font-size: 1rem; cursor: pointer;
-      box-shadow: 0 10px 24px rgba(102,126,234,.45); transition: transform .18s ease, box-shadow .18s ease;
-    }
-    .btn:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(102,126,234,.6); }
-    .btn.secondary { background: #fff; color: #5b67e5; border: 2px solid #5b67e5; box-shadow: none; }
-    .btn.secondary:hover { background: #f5f6ff; }
+    .welcome{height:100%;display:grid;place-items:center}
+    .welcome-inner{max-width:980px;text-align:center}
+    .welcome h1{font-size:clamp(1.6rem,3.2vw,2.6rem);color:#fff;text-shadow:0 2px 16px rgba(0,0,0,.25);margin-bottom:14px}
+    .welcome .card h2{color:#667eea;font-size:1.4rem;margin-bottom:6px}
+    .welcome .card p{color:#555;line-height:1.5;font-size:1rem;margin:8px auto;max-width:760px}
+    .actions{display:flex;gap:12px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+    .btn{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border:0;border-radius:999px;padding:14px 22px;font-size:1rem;cursor:pointer;box-shadow:0 10px 24px rgba(102,126,234,.45);transition:transform .18s ease,box-shadow .18s ease}
+    .btn:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(102,126,234,.6)}
+    .btn.secondary{background:#fff;color:#5b67e5;border:2px solid #5b67e5;box-shadow:none}
+    .btn.secondary:hover{background:#f5f6ff}
 
-    /* Game screen */
-    .game { display: none; height: 100%; grid-template-rows: auto 10px 1fr; gap: 10px; }
+    /* Game */
+    .game{display:none;height:100%;grid-template-rows:auto 10px 1fr;gap:10px}
+    .header{display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .title{color:#fff;text-shadow:0 2px 16px rgba(0,0,0,.3);font-weight:700;font-size:clamp(1.1rem,2.2vw,1.6rem)}
+    .hud.card{display:flex;align-items:center;justify-content:space-between;gap:18px}
+    .stat{display:flex;align-items:center;gap:8px;font-weight:600;color:#667eea}
+    .stat small{color:#555;font-weight:500}
+    .progress{background:#ffffff55;border-radius:8px;overflow:hidden;height:10px}
+    .bar{height:100%;width:0;background:linear-gradient(90deg,#4caf50 0%,#8bc34a 100%);color:#fff;font-size:.7rem;line-height:10px;text-align:center;transition:width .45s ease}
+    .main{display:grid;grid-template-columns:1.2fr 1fr;gap:10px;height:calc(100% - 0px)}
+    .scenario.card{display:grid;grid-template-rows:auto 1fr;place-items:center;text-align:center}
+    .scenario .label{color:#764ba2;font-size:.8rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+    .scenario .text{font-size:clamp(1rem,1.6vw,1.2rem);line-height:1.4;color:#222;max-width:90%}
+    .choices.card{display:grid;align-content:center;gap:8px;overflow:hidden}
+    .choice{display:flex;align-items:center;gap:14px;text-align:left;border-radius:12px;border:3px solid transparent;background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);padding:12px 14px;cursor:pointer;transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease}
+    .choice:hover:not(.disabled){transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.2);border-color:#667eea;background:linear-gradient(135deg,#e3f2fd 0%,#bbdefb 100%)}
+    .choice.disabled{pointer-events:none;opacity:.92}
+    .choice.correct{background:linear-gradient(135deg,#84fab0 0%,#8fd3f4 100%);border-color:#2e7d32;animation:correctPulse .4s ease}
+    .choice.incorrect{background:linear-gradient(135deg,#ff9a9e 0%,#fecfef 100%);border-color:#c62828;animation:shake .45s ease}
+    .letter{background:#667eea;color:#fff;width:34px;height:34px;display:grid;place-items:center;border-radius:999px;font-weight:800;flex-shrink:0}
+    .choice.correct .letter{background:#2e7d32}
+    .choice.incorrect .letter{background:#c62828}
+    .cmeta{flex:1}
+    .cname{font-weight:700;color:#222;font-size:.98rem}
+    .ccat{font-size:.8rem;color:#555;font-style:italic}
 
-    .header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-    .title { color: #fff; text-shadow: 0 2px 16px rgba(0,0,0,.3); font-weight: 700; font-size: clamp(1.1rem, 2.2vw, 1.6rem); }
-    .hud.card { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
-    .stat { display: flex; align-items: center; gap: 8px; font-weight: 600; color: #667eea; }
-    .stat small { color: #555; font-weight: 500; }
+    /* Overlay */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:999;animation:fadeIn .2s ease}
+    .overlay.show{display:flex}
+    .fbox{background:#fff;padding:36px 48px;border-radius:14px;text-align:center;box-shadow:0 16px 36px rgba(0,0,0,.35);animation:scaleIn .25s ease;max-width:760px;position:relative}
+    .fbox h2{font-size:2.2rem;margin-bottom:10px}
+    .fbox.correct h2{color:#2e7d32}
+    .fbox.incorrect h2{color:#c62828}
+    .fbox p{color:#444;font-size:1.05rem}
+    .explain{margin-top:10px;color:#333;font-size:.98rem}
+    .closex{position:absolute;top:10px;right:10px;border:none;background:#eef; color:#4b57d6; width:34px;height:34px;border-radius:50%;font-weight:800;cursor:pointer}
+    .closex:hover{filter:brightness(.95)}
+    .stay{margin-top:12px;font-size:.85rem;color:#666}
 
-    .progress { background: #ffffff55; border-radius: 8px; overflow: hidden; height: 10px; }
-    .bar { height: 100%; width: 0%; background: linear-gradient(90deg, #4caf50 0%, #8bc34a 100%); color:#fff; font-size: .7rem; line-height: 10px; text-align: center; transition: width .45s ease; }
-
-    .main { display: grid; grid-template-columns: 1.2fr 1fr; gap: 10px; height: calc(100% - 0px); }
-    .scenario.card { display: grid; grid-template-rows: auto 1fr; place-items: center; text-align: center; }
-    .scenario .label { color: #764ba2; font-size: .8rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
-    .scenario .text { font-size: clamp(1rem, 1.6vw, 1.2rem); line-height: 1.4; color: #222; max-width: 90%; }
-
-    .choices.card { display: grid; align-content: center; gap: 8px; overflow: hidden; }
-    .choice { display: flex; align-items: center; gap: 14px; text-align: left; border-radius: 12px; border: 3px solid transparent;
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); padding: 12px 14px; cursor: pointer; transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease; }
-    .choice:hover:not(.disabled){ transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,.2); border-color: #667eea; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); }
-    .choice.disabled{ pointer-events:none; opacity:.92 }
-    .choice.correct{ background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%); border-color:#2e7d32; animation: correctPulse .4s ease; }
-    .choice.incorrect{ background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); border-color:#c62828; animation: shake .45s ease; }
-    .letter{ background:#667eea; color:#fff; width:34px; height:34px; display:grid; place-items:center; border-radius:999px; font-weight:800; flex-shrink:0; }
-    .choice.correct .letter{ background:#2e7d32; }
-    .choice.incorrect .letter{ background:#c62828; }
-    .cmeta{ flex:1; }
-    .cname{ font-weight:700; color:#222; font-size: .98rem; }
-    .ccat{ font-size:.8rem; color:#555; font-style: italic; }
-
-    /* Feedback */
-    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); display:none; align-items:center; justify-content:center; z-index:999; animation: fadeIn .2s ease; }
-    .overlay.show{ display:flex; }
-    .fbox{ background:#fff; padding:36px 42px; border-radius:14px; text-align:center; box-shadow:0 16px 36px rgba(0,0,0,.35); animation: scaleIn .25s ease; max-width:720px; }
-    .fbox h2{ font-size: 2.4rem; margin-bottom: 10px; }
-    .fbox.correct h2{ color:#2e7d32; }
-    .fbox.incorrect h2{ color:#c62828; }
-    .fbox p{ color:#444; font-size: 1.05rem; }
-    .explain{ margin-top:10px; color:#333; font-size:.98rem; }
-
-    /* Completion */
-    .done{ display:none; height:100%; place-items:center; text-align:center; }
-    .done h1{ color:#4caf50; font-size: clamp(1.6rem, 3vw, 2.6rem); margin-bottom: 10px; }
-    .stats{ display:flex; gap:20px; justify-content:center; margin: 18px 0 10px; flex-wrap: wrap; }
-    .statbox{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:#fff; padding: 22px 28px; border-radius: 14px; min-width: 160px; }
-    .statbox .lab{ opacity:.92; font-size:.95rem; }
-    .statbox .val{ font-weight:800; font-size: 2rem; }
+    /* Done */
+    .done{display:none;height:100%;place-items:center;text-align:center}
+    .done h1{color:#4caf50;font-size:clamp(1.6rem,3vw,2.6rem);margin-bottom:10px}
+    .stats{display:flex;gap:20px;justify-content:center;margin:18px 0 10px;flex-wrap:wrap}
+    .statbox{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:22px 28px;border-radius:14px;min-width:160px}
+    .statbox .lab{opacity:.92;font-size:.95rem}
+    .statbox .val{font-weight:800;font-size:2rem}
 
     /* Animations */
-    @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
-    @keyframes scaleIn{ from{ transform: scale(.88) } to{ transform: scale(1) } }
-    @keyframes correctPulse{ 0%,100%{transform:scale(1)} 50%{transform:scale(1.03)} }
-    @keyframes shake{ 0%,100%{ transform: translateX(0) } 25%{ transform: translateX(-10px) } 75%{ transform: translateX(10px) } }
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    @keyframes scaleIn{from{transform:scale(.88)}to{transform:scale(1)}}
+    @keyframes correctPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+    @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
 
-    /* Responsive: keep single screen without scrolling */
-    @media (max-width: 900px){ .main{ grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; } .scenario .text{ max-width: 96%; } }
+    @media (max-width:900px){.main{grid-template-columns:1fr;grid-template-rows:1fr 1fr}.scenario .text{max-width:96%}}
   </style>
 </head>
 <body>
   <div class="container">
-
-    <!-- Welcome -->
     <section class="welcome" id="welcome">
       <div class="welcome-inner">
         <h1>🧠 AI & Cognitive Biases — Interactive Matcher</h1>
         <div class="card">
           <h2>Welcome, Counselors</h2>
-          <p>Match each real counseling scenario to the correct cognitive bias / fallacy (or standard defense mechanism). Learn fast, have fun, and keep it all on one screen—no scrolling required.</p>
+          <p>Match each real counseling scenario to the correct bias / fallacy (or standard defense mechanism). Learn fast, have fun, and keep it all on one screen—no scrolling.</p>
           <div class="actions">
             <button class="btn" id="startQuick">🚀 Quick Play (10)</button>
             <button class="btn secondary" id="startFull">🧩 Full Deck (36)</button>
@@ -119,7 +101,6 @@
       </div>
     </section>
 
-    <!-- Game -->
     <section class="game" id="game">
       <div class="header">
         <div class="title">🎯 Match the Cognitive Bias</div>
@@ -138,191 +119,188 @@
       </div>
     </section>
 
-    <!-- Completion -->
     <section class="done" id="done">
       <div class="card" style="max-width:900px;">
         <h1>🎉 Game Complete!</h1>
-        <p style="color:#555; font-size:1.05rem;">Understanding these patterns helps us integrate AI thoughtfully—augmenting, not replacing, human care.</p>
+        <p style="color:#555;font-size:1.05rem">Thoughtful integration beats fear—augment, don’t replace, human care.</p>
         <div class="stats">
           <div class="statbox"><div class="lab">Final Score</div><div class="val" id="finalScore">0</div></div>
           <div class="statbox"><div class="lab">Accuracy</div><div class="val" id="finalAcc">0%</div></div>
         </div>
-        <div class="actions" style="margin-top:10px;">
+        <div class="actions" style="margin-top:10px">
           <button class="btn" id="playAgain">🔄 Play Again</button>
         </div>
       </div>
     </section>
-
   </div>
 
-  <!-- Feedback overlay -->
-  <div class="overlay" id="overlay"><div class="fbox" id="fbox"><h2 id="ficon">✓</h2><p id="fmsg"></p><div class="explain" id="explain"></div></div></div>
+  <!-- Feedback overlay with manual close (X) and ESC support -->
+  <div class="overlay" id="overlay" aria-modal="true" role="dialog">
+    <div class="fbox" id="fbox">
+      <button class="closex" id="closex" aria-label="Close feedback">×</button>
+      <h2 id="ficon">✓</h2>
+      <p id="fmsg"></p>
+      <div class="explain" id="explain"></div>
+      <div class="stay">(Closes in <span id="count">4</span>s — or press <strong>Esc</strong>, click outside, or ×)</div>
+    </div>
+  </div>
 
 <script>
-  // === DATASET: exactly the corrected 36 items (names + scenarios) ===
-  // Each item also includes a succinct explanation for learning feedback.
-  const DATA = [
-    {name: "Status quo bias", cat: "Resistance & Denial", icon: "🔒", explain: "Preference for current state; changes feel costly or risky.", scenario: "A therapist insists on using only paper intake forms because ‘my current system works fine,’ despite clients requesting digital options and missing appointments due to paperwork delays."},
-    {name: "Minimization (defense) / Motivated reasoning", cat: "Resistance & Denial", icon: "🙈", explain: "Downplaying disconfirming evidence to protect a preferred view.", scenario: "A clinical supervisor dismisses AI-assisted note-taking as ‘just a fad’ even after three colleagues report saving 5+ hours weekly and having more energy for client care."},
-    {name: "Normalcy bias", cat: "Resistance & Denial", icon: "📅", explain: "Assuming things will keep working as they have, underestimating change.", scenario: "A counseling practice owner plans a 5-year expansion assuming AI capabilities will stay the same, ignoring monthly breakthroughs reported in professional journals."},
-    {name: "Belief perseverance / Confirmation bias", cat: "Resistance & Denial", icon: "🚫", explain: "Clinging to prior beliefs and seeking supportive evidence only.", scenario: "Before attending a workshop on AI tools, a counselor declares ‘machines can never understand emotions’ and decides the training will be useless."},
-    {name: "Rationalization (defense) / Motivated reasoning", cat: "Resistance & Denial", icon: "🎭", explain: "Constructing plausible but self-serving reasons to avoid change.", scenario: "A psychologist invokes ‘the sacred therapeutic relationship’ to avoid learning AI documentation tools, while spending 2 hours nightly on paperwork instead of self-care."},
-    {name: "Appeal to tradition (argumentum ad antiquitatem)", cat: "Resistance & Denial", icon: "📜", explain: "Claiming something is better because ‘it’s always been done that way.’", scenario: "A counselor argues against telehealth with AI scheduling because ‘therapists have always met face-to-face for 100 years.’"},
-    {name: "In-group bias + Omission bias", cat: "Resistance & Denial", icon: "🚷", explain: "Favoring one’s group; harm by inaction (failing to extend access).", scenario: "A clinic serves only affluent in-person clients, refusing AI-enhanced teletherapy that could reach underserved rural communities."},
+  // === DATASET: corrected 36 items ===
+  const DATA=[
+    {name:"Status quo bias",cat:"Resistance & Denial",icon:"🔒",explain:"Preference for current state; changes feel costly or risky.",scenario:"A therapist insists on using only paper intake forms because ‘my current system works fine,’ despite clients requesting digital options and missing appointments due to paperwork delays."},
+    {name:"Minimization (defense) / Motivated reasoning",cat:"Resistance & Denial",icon:"🙈",explain:"Downplaying disconfirming evidence to protect a preferred view.",scenario:"A clinical supervisor dismisses AI-assisted note-taking as ‘just a fad’ even after three colleagues report saving 5+ hours weekly and having more energy for client care."},
+    {name:"Normalcy bias",cat:"Resistance & Denial",icon:"📅",explain:"Assuming things will keep working as they have, underestimating change.",scenario:"A counseling practice owner plans a 5-year expansion assuming AI capabilities will stay the same, ignoring monthly breakthroughs reported in professional journals."},
+    {name:"Belief perseverance / Confirmation bias",cat:"Resistance & Denial",icon:"🚫",explain:"Clinging to prior beliefs and seeking supportive evidence only.",scenario:"Before attending a workshop on AI tools, a counselor declares ‘machines can never understand emotions’ and decides the training will be useless."},
+    {name:"Rationalization (defense) / Motivated reasoning",cat:"Resistance & Denial",icon:"🎭",explain:"Constructing plausible but self-serving reasons to avoid change.",scenario:"A psychologist invokes ‘the sacred therapeutic relationship’ to avoid learning AI documentation tools, while spending 2 hours nightly on paperwork instead of self-care."},
+    {name:"Appeal to tradition (argumentum ad antiquitatem)",cat:"Resistance & Denial",icon:"📜",explain:"Claiming something is better because ‘it’s always been done that way.’",scenario:"A counselor argues against telehealth with AI scheduling because ‘therapists have always met face-to-face for 100 years.’"},
+    {name:"In-group bias + Omission bias",cat:"Resistance & Denial",icon:"🚷",explain:"Favoring one’s group; harm by inaction (failing to extend access).",scenario:"A clinic serves only affluent in-person clients, refusing AI-enhanced teletherapy that could reach underserved rural communities."},
 
-    {name: "Catastrophizing + All-or-nothing thinking", cat: "Fear & Threat", icon: "💥", explain: "Exaggerating worst outcomes; seeing only extremes.", scenario: "Hearing about AI chatbots, a counselor concludes ‘this is the end of our profession’ and refuses to explore assistive uses."},
-    {name: "Ambiguity aversion + Affect heuristic", cat: "Fear & Threat", icon: "😰", explain: "Avoiding unfamiliar options; feelings drive risk judgment.", scenario: "A therapist who has never tried AI tools fears ‘robots taking over,’ but calms after a 20-minute transcription demo."},
-    {name: "Identity-protective cognition", cat: "Fear & Threat", icon: "🛡️", explain: "Rejecting information to protect status/identity within a group.", scenario: "When AI diagnostic support appears, a senior therapist argues ‘using tech shows we’re not real clinicians,’ defending their expert identity."},
-    {name: "Availability cascade + Negativity bias", cat: "Fear & Threat", icon: "☠️", explain: "Repetition and negative content feel more true/likely.", scenario: "A counselor fixates on articles predicting ‘AI will eliminate all therapy jobs by 2030,’ doom-checking daily instead of learning adaptive skills."},
-    {name: "Ambiguity aversion (fear of the unknown)", cat: "Fear & Threat", icon: "❓", explain: "Preferring known risks to unknown ones.", scenario: "A therapist avoids reading about AI mental-health tools because unfamiliarity is anxiety-provoking, despite client needs."},
+    {name:"Catastrophizing + All-or-nothing thinking",cat:"Fear & Threat",icon:"💥",explain:"Exaggerating worst outcomes; seeing only extremes.",scenario:"Hearing about AI chatbots, a counselor concludes ‘this is the end of our profession’ and refuses to explore assistive uses."},
+    {name:"Ambiguity aversion + Affect heuristic",cat:"Fear & Threat",icon:"😰",explain:"Avoiding unfamiliar options; feelings drive risk judgment.",scenario:"A therapist who has never tried AI tools fears ‘robots taking over,’ but calms after a 20-minute transcription demo."},
+    {name:"Identity-protective cognition",cat:"Fear & Threat",icon:"🛡️",explain:"Rejecting information to protect status/identity within a group.",scenario:"When AI diagnostic support appears, a senior therapist argues ‘using tech shows we’re not real clinicians,’ defending their expert identity."},
+    {name:"Availability cascade + Negativity bias",cat:"Fear & Threat",icon:"☠️",explain:"Repetition and negative content feel more true/likely.",scenario:"A counselor fixates on articles predicting ‘AI will eliminate all therapy jobs by 2030,’ doom-checking daily instead of learning adaptive skills."},
+    {name:"Ambiguity aversion (fear of the unknown)",cat:"Fear & Threat",icon:"❓",explain:"Preferring known risks to unknown ones.",scenario:"A therapist avoids reading about AI mental-health tools because unfamiliarity is anxiety-provoking, despite client needs."},
 
-    {name: "Availability heuristic", cat: "Information Processing", icon: "📰", explain: "Judging risk/frequency by what comes easily to mind.", scenario: "After one viral story about a harmful chatbot, a counselor assumes all AI tools are dangerous, ignoring many successful implementations."},
-    {name: "Confirmation bias", cat: "Information Processing", icon: "🔍", explain: "Seeking/valuing evidence that confirms prior views.", scenario: "A therapist skeptical of AI only reads critical articles and ignores peer‑reviewed studies showing benefits of AI-assisted interventions."},
-    {name: "Cognitive dissonance", cat: "Information Processing", icon: "😵", explain: "Discomfort from conflicting beliefs/behaviors prompts defensiveness.", scenario: "A counselor saying ‘AI has no place in therapy’ feels discomfort when their favorite CE platform personalizes with AI and becomes defensive."},
-    {name: "Need for cognitive closure", cat: "Information Processing", icon: "🚪", explain: "Desire for quick, definite answers; discomfort with nuance.", scenario: "Asked about AI in counseling, a therapist insists ‘it’s good or bad—I must decide now,’ avoiding open-ended inquiry."},
-    {name: "Intolerance of uncertainty (IU)", cat: "Information Processing", icon: "⚖️", explain: "Difficulty acting amid reasonable uncertainty.", scenario: "A supervisor demands absolute certainty about AI’s impact before piloting anything."},
-    {name: "Red herring (irrelevant thesis)", cat: "Information Processing", icon: "🐟", explain: "Diverting to an irrelevant issue to avoid the point.", scenario: "During AI scheduling planning, a therapist derails into debates about ‘true consciousness.’"},
-    {name: "Focusing illusion (salience bias)", cat: "Information Processing", icon: "🔬", explain: "Overweighting one salient aspect; neglecting the rest.", scenario: "A counselor fixates on AI’s lack of empathy while ignoring that admin tools could free 10 hours weekly for empathic contact."},
+    {name:"Availability heuristic",cat:"Information Processing",icon:"📰",explain:"Judging risk/frequency by what comes easily to mind.",scenario:"After one viral story about a harmful chatbot, a counselor assumes all AI tools are dangerous, ignoring many successful implementations."},
+    {name:"Confirmation bias",cat:"Information Processing",icon:"🔍",explain:"Seeking/valuing evidence that confirms prior views.",scenario:"A therapist skeptical of AI only reads critical articles and ignores peer‑reviewed studies showing benefits of AI-assisted interventions."},
+    {name:"Cognitive dissonance",cat:"Information Processing",icon:"😵",explain:"Discomfort from conflicting beliefs/behaviors prompts defensiveness.",scenario:"A counselor saying ‘AI has no place in therapy’ feels discomfort when their favorite CE platform personalizes with AI and becomes defensive."},
+    {name:"Need for cognitive closure",cat:"Information Processing",icon:"🚪",explain:"Desire for quick, definite answers; discomfort with nuance.",scenario:"Asked about AI in counseling, a therapist insists ‘it’s good or bad—I must decide now,’ avoiding open-ended inquiry."},
+    {name:"Intolerance of uncertainty (IU)",cat:"Information Processing",icon:"⚖️",explain:"Difficulty acting amid reasonable uncertainty.",scenario:"A supervisor demands absolute certainty about AI’s impact before piloting anything."},
+    {name:"Red herring (irrelevant thesis)",cat:"Information Processing",icon:"🐟",explain:"Diverting to an irrelevant issue to avoid the point.",scenario:"During AI scheduling planning, a therapist derails into debates about ‘true consciousness.’"},
+    {name:"Focusing illusion (salience bias)",cat:"Information Processing",icon:"🔬",explain:"Overweighting one salient aspect; neglecting the rest.",scenario:"A counselor fixates on AI’s lack of empathy while ignoring that admin tools could free 10 hours weekly for empathic contact."},
 
-    {name: "Status quo bias + Omission bias", cat: "Decision-Making & Agency", icon: "🤷", explain: "Defaulting to inaction; harm from not trying a low‑risk test.", scenario: "A therapy group debates AI transcription for six months without running a simple 2‑week pilot to get data."},
-    {name: "Sunk-cost fallacy (escalation of commitment)", cat: "Decision-Making & Agency", icon: "💸", explain: "Continuing a poor option due to past investment.", scenario: "A counselor keeps an outdated system because ‘I invested so much time learning it,’ despite better AI‑enhanced alternatives."},
-    {name: "False dichotomy (either–or fallacy)", cat: "Decision-Making & Agency", icon: "⚡", explain: "Forcing a binary choice; ignoring middle options.", scenario: "‘Either embrace AI completely and lose humanity, or reject it entirely’—ignoring selective, ethical integration."},
+    {name:"Status quo bias + Omission bias",cat:"Decision-Making & Agency",icon:"🤷",explain:"Defaulting to inaction; harm from not trying a low‑risk test.",scenario:"A therapy group debates AI transcription for six months without running a simple 2‑week pilot to get data."},
+    {name:"Sunk-cost fallacy (escalation of commitment)",cat:"Decision-Making & Agency",icon:"💸",explain:"Continuing a poor option due to past investment.",scenario:"A counselor keeps an outdated system because ‘I invested so much time learning it,’ despite better AI‑enhanced alternatives."},
+    {name:"False dichotomy (either–or fallacy)",cat:"Decision-Making & Agency",icon:"⚡",explain:"Forcing a binary choice; ignoring middle options.",scenario:"‘Either embrace AI completely and lose humanity, or reject it entirely’—ignoring selective, ethical integration."},
 
-    {name: "Belief perseverance + Self‑enhancement bias", cat: "Existential & Identity", icon: "🌊", explain: "Holding identity‑affirming beliefs despite new evidence.", scenario: "A seasoned therapist feels disoriented that AI drafts summaries as well as they can and struggles to reconcile this with self‑image."},
-    {name: "Cognitive dissonance (belief updating)", cat: "Existential & Identity", icon: "🧩", explain: "Adjusting beliefs after disconfirming experience.", scenario: "After AI increases client face‑time, a counselor revises ‘tech depersonalizes care,’ with temporary discomfort."},
-    {name: "System‑justification + Human exceptionalism bias", cat: "Existential & Identity", icon: "👤", explain: "Defending status quo; assuming human superiority by default.", scenario: "‘Humans are inherently better at therapy’ is used for comfort even when some AI‑supported outcomes match or exceed."},
-    {name: "Anthropocentrism", cat: "Existential & Identity", icon: "🧑", explain: "Centering humans; discounting nonhuman tools’ contributions.", scenario: "A counselor dismisses AI mood tracking because ‘only humans understand emotions,’ ignoring complementary pattern recognition."},
-    {name: "Loss aversion + Zero‑sum bias", cat: "Existential & Identity", icon: "💼", explain: "Overweighting losses; seeing gains as others’ losses.", scenario: "A newly licensed therapist worries ‘AI makes my degree worthless’ instead of exploring complementary skills."},
+    {name:"Belief perseverance + Self‑enhancement bias",cat:"Existential & Identity",icon:"🌊",explain:"Holding identity‑affirming beliefs despite new evidence.",scenario:"A seasoned therapist feels disoriented that AI drafts summaries as well as they can and struggles to reconcile this with self‑image."},
+    {name:"Cognitive dissonance (belief updating)",cat:"Existential & Identity",icon:"🧩",explain:"Adjusting beliefs after disconfirming experience.",scenario:"After AI increases client face‑time, a counselor revises ‘tech depersonalizes care,’ with temporary discomfort."},
+    {name:"System‑justification + Human exceptionalism bias",cat:"Existential & Identity",icon:"👤",explain:"Defending status quo; assuming human superiority by default.",scenario:"‘Humans are inherently better at therapy’ is used for comfort even when some AI‑supported outcomes match or exceed."},
+    {name:"Anthropocentrism",cat:"Existential & Identity",icon:"🧑",explain:"Centering humans; discounting nonhuman tools’ contributions.",scenario:"A counselor dismisses AI mood tracking because ‘only humans understand emotions,’ ignoring complementary pattern recognition."},
+    {name:"Loss aversion + Zero‑sum bias",cat:"Existential & Identity",icon:"💼",explain:"Overweighting losses; seeing gains as others’ losses.",scenario:"A newly licensed therapist worries ‘AI makes my degree worthless’ instead of exploring complementary skills."},
 
-    {name: "Negativity bias + Availability cascade", cat: "Emotion & Media", icon: "📉", explain: "Preferentially attending to repeated negative content.", scenario: "A therapist binge‑watches ‘AI will destroy care’ videos, fueling anxiety instead of learning."},
-    {name: "Anthropomorphism (anthropomorphic bias)", cat: "Emotion & Media", icon: "🤖", explain: "Ascribing human motives/feelings to a tool.", scenario: "A counselor says ‘the AI is trying to replace us,’ as if it has intentions."},
-    {name: "Automation bias", cat: "Emotion & Media", icon: "✨", explain: "Over‑trusting automated outputs over human judgment.", scenario: "A therapist prefers AI advice over peer consultation because ‘AI never judges my questions.’"},
-    {name: "Projection (defense mechanism)", cat: "Emotion & Media", icon: "🪞", explain: "Attributing one’s own feelings to others.", scenario: "A counselor fearing inadequacy accuses AI‑using colleagues of ‘cheating’ and being threatened."},
+    {name:"Negativity bias + Availability cascade",cat:"Emotion & Media",icon:"📉",explain:"Preferentially attending to repeated negative content.",scenario:"A therapist binge‑watches ‘AI will destroy care’ videos, fueling anxiety instead of learning."},
+    {name:"Anthropomorphism (anthropomorphic bias)",cat:"Emotion & Media",icon:"🤖",explain:"Ascribing human motives/feelings to a tool.",scenario:"A counselor says ‘the AI is trying to replace us,’ as if it has intentions."},
+    {name:"Automation bias",cat:"Emotion & Media",icon:"✨",explain:"Over‑trusting automated outputs over human judgment.",scenario:"A therapist prefers AI advice over peer consultation because ‘AI never judges my questions.’"},
+    {name:"Projection (defense mechanism)",cat:"Emotion & Media",icon:"🪞",explain:"Attributing one’s own feelings to others.",scenario:"A counselor fearing inadequacy accuses AI‑using colleagues of ‘cheating’ and being threatened."},
 
-    {name: "Illusory pattern perception (apophenia) + Conspiracy mentality", cat: "Extreme / Pathological", icon: "🕵️", explain: "Seeing deliberate patterns/plots where none exist.", scenario: "A therapist believes tech firms are ‘secretly programming AI to destroy counseling’ and finds ‘evidence’ in each announcement."},
-    {name: "Magical thinking (cognitive distortion)", cat: "Extreme / Pathological", icon: "✨", explain: "Believing thoughts/objects have supernatural causal power.", scenario: "A counselor believes AI can read minds and predict the future, leading to unrealistic fear or hype."},
-    {name: "Confirmation bias + Echo‑chamber effect", cat: "Extreme / Pathological", icon: "🌀", explain: "Self‑reinforcing information loops amplify prior beliefs.", scenario: "A therapist spends hours getting AI to validate detached theories, isolating from clinical reality and feedback."},
-    {name: "Illusory superiority (Dunning–Kruger‑adjacent)", cat: "Extreme / Pathological", icon: "👑", explain: "Overestimating one’s specialness/ability relative to others.", scenario: "A counselor believes AI has ‘chosen’ them for unique insights above ‘ordinary’ colleagues."},
-    {name: "Echo‑chamber effect + Group polarization", cat: "Extreme / Pathological", icon: "🏝️", explain: "Withdrawing into like‑minded groups increases extremity.", scenario: "A therapist stops attending supervision, convinced only AI understands their ‘revolutionary’ views."}
+    {name:"Illusory pattern perception (apophenia) + Conspiracy mentality",cat:"Extreme / Pathological",icon:"🕵️",explain:"Seeing deliberate patterns/plots where none exist.",scenario:"A therapist believes tech firms are ‘secretly programming AI to destroy counseling’ and finds ‘evidence’ in each announcement."},
+    {name:"Magical thinking (cognitive distortion)",cat:"Extreme / Pathological",icon:"✨",explain:"Believing thoughts/objects have supernatural causal power.",scenario:"A counselor believes AI can read minds and predict the future, leading to unrealistic fear or hype."},
+    {name:"Confirmation bias + Echo‑chamber effect",cat:"Extreme / Pathological",icon:"🌀",explain:"Self‑reinforcing information loops amplify prior beliefs.",scenario:"A therapist spends hours getting AI to validate detached theories, isolating from clinical reality and feedback."},
+    {name:"Illusory superiority (Dunning–Kruger‑adjacent)",cat:"Extreme / Pathological",icon:"👑",explain:"Overestimating one’s specialness/ability relative to others.",scenario:"A counselor believes AI has ‘chosen’ them for unique insights above ‘ordinary’ colleagues."},
+    {name:"Echo‑chamber effect + Group polarization",cat:"Extreme / Pathological",icon:"🏝️",explain:"Withdrawing into like‑minded groups increases extremity.",scenario:"A therapist stops attending supervision, convinced only AI understands their ‘revolutionary’ views."}
   ];
 
-  // === State ===
-  const state = { deck: [], qIndex: 0, score: 0, attempts: 0, total: 0 };
+  const $=s=>document.querySelector(s);
+  const shuffle=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);
+  const state={deck:[],qIndex:0,score:0,attempts:0,total:0};
 
-  // === Helpers ===
-  const $ = sel => document.querySelector(sel);
-  const shuffle = arr => arr.map(v => [Math.random(), v]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
-
-  function startGame(totalQuestions){
-    $('#welcome').style.display = 'none';
-    $('#done').style.display = 'none';
-    $('#game').style.display = 'grid';
-
-    const deck = shuffle([...DATA]);
-    state.deck = deck.slice(0, Math.min(totalQuestions, deck.length));
-    state.qIndex = 0; state.score = 0; state.attempts = 0; state.total = state.deck.length;
-
-    $('#total').textContent = state.total;
-    $('#score').textContent = 0; $('#acc').textContent = '0%';
-
+  function startGame(n){
+    $('#welcome').style.display='none';
+    $('#done').style.display='none';
+    $('#game').style.display='grid';
+    state.deck=shuffle([...DATA]).slice(0,Math.min(n,DATA.length));
+    state.qIndex=0;state.score=0;state.attempts=0;state.total=state.deck.length;
+    $('#total').textContent=state.total;$('#score').textContent=0;$('#acc').textContent='0%';
     renderQuestion();
   }
 
   function renderQuestion(){
-    const item = state.deck[state.qIndex];
-    $('#scenario').textContent = item.scenario;
+    const item=state.deck[state.qIndex];
+    $('#scenario').textContent=item.scenario;
     updateProgress();
-
-    // build choices: 1 correct + 4 distractors
-    const pool = DATA.filter(x => x.name !== item.name);
-    const distractors = shuffle(pool).slice(0,4);
-    const opts = shuffle([item, ...distractors]);
-    const letters = ['A','B','C','D','E'];
-
-    $('#choices').innerHTML = opts.map((o,i)=>`
+    const pool=DATA.filter(x=>x.name!==item.name);
+    const distractors=shuffle(pool).slice(0,4);
+    const opts=shuffle([item,...distractors]);
+    const letters=['A','B','C','D','E'];
+    $('#choices').innerHTML=opts.map((o,i)=>`
       <button class="choice" data-name="${o.name.replace(/"/g,'&quot;')}" aria-label="${o.name}">
         <div class="letter">${letters[i]}</div>
         <div class="cmeta">
-          <div class="cname">${o.icon || ''} ${o.name}</div>
+          <div class="cname">${o.icon||''} ${o.name}</div>
           <div class="ccat">${o.cat}</div>
         </div>
-      </button>
-    `).join('');
-
-    // wire clicks
-    document.querySelectorAll('.choice').forEach(btn => btn.addEventListener('click', ()=> select(btn, item)));
-
-    // keyboard: 1-5
-    window.onkeydown = (e)=>{
-      if(['1','2','3','4','5'].includes(e.key)){
-        const idx = parseInt(e.key,10)-1; const target = document.querySelectorAll('.choice')[idx];
-        if(target) target.click();
-      }
-    };
+      </button>`).join('');
+    document.querySelectorAll('.choice').forEach(btn=>btn.addEventListener('click',()=>select(btn,item)));
+    window.onkeydown=e=>{if(['1','2','3','4','5'].includes(e.key)){const idx=parseInt(e.key,10)-1;const t=document.querySelectorAll('.choice')[idx];if(t)t.click();}};
   }
 
-  function select(btn, correct){
-    const selectedName = btn.getAttribute('data-name');
-    const isRight = selectedName === correct.name;
+  async function select(btn,correct){
+    const selected=btn.getAttribute('data-name');
+    const ok=selected===correct.name;
     state.attempts++;
-
-    document.querySelectorAll('.choice').forEach(b=> b.classList.add('disabled'));
-    btn.classList.add(isRight? 'correct': 'incorrect');
-
-    if(isRight){ state.score++; showFeedback(true, `Correct — ${correct.name}`, correct.explain); }
-    else { showFeedback(false, `Not quite. Answer: ${correct.name}`, correct.explain); }
-
+    document.querySelectorAll('.choice').forEach(b=>b.classList.add('disabled'));
+    btn.classList.add(ok?'correct':'incorrect');
+    if(ok){state.score++; await showFeedback(true,`Correct — ${correct.name}`,correct.explain);} else {await showFeedback(false,`Not quite. Answer: ${correct.name}`,correct.explain);} 
     updateHUD();
-
-    setTimeout(()=>{
-      next();
-    }, 2000);
+    next();
   }
 
   function updateHUD(){
-    $('#score').textContent = state.score;
-    const acc = state.attempts ? Math.round((state.score/state.attempts)*100) : 0;
-    $('#acc').textContent = acc + '%';
+    $('#score').textContent=state.score;
+    const acc=state.attempts?Math.round((state.score/state.attempts)*100):0;
+    $('#acc').textContent=acc+'%';
   }
 
   function updateProgress(){
-    const pct = Math.round(((state.qIndex+1)/state.total)*100);
-    const bar = $('#bar');
-    bar.style.width = pct + '%';
-    bar.textContent = `Question ${state.qIndex+1} of ${state.total}`;
+    const pct=Math.round(((state.qIndex+1)/state.total)*100);
+    const bar=$('#bar');bar.style.width=pct+'%';bar.textContent=`Question ${state.qIndex+1} of ${state.total}`;
   }
 
   function next(){
     state.qIndex++;
-    if(state.qIndex < state.total){
-      renderQuestion();
-    } else {
-      finish();
-    }
-  }
-
-  function showFeedback(ok, msg, explain){
-    const o = $('#overlay'); const box = $('#fbox');
-    box.className = 'fbox ' + (ok? 'correct' : 'incorrect');
-    $('#ficon').textContent = ok? '✓' : '✗';
-    $('#fmsg').textContent = msg;
-    $('#explain').textContent = explain || '';
-    o.classList.add('show');
-    setTimeout(()=> o.classList.remove('show'), 1600);
+    if(state.qIndex<state.total){renderQuestion();} else {finish();}
   }
 
   function finish(){
-    $('#game').style.display = 'none';
-    $('#done').style.display = 'grid';
-    $('#finalScore').textContent = `${state.score}/${state.total}`;
-    const acc = state.attempts ? Math.round((state.score/state.attempts)*100) : 0;
-    $('#finalAcc').textContent = acc + '%';
+    $('#game').style.display='none';
+    $('#done').style.display='grid';
+    $('#finalScore').textContent=`${state.score}/${state.total}`;
+    const acc=state.attempts?Math.round((state.score/state.attempts)*100):0;
+    $('#finalAcc').textContent=acc+'%';
   }
 
-  // === wire buttons ===
-  $('#startQuick').addEventListener('click', ()=> startGame(10));
-  $('#startFull').addEventListener('click', ()=> startGame(36));
-  $('#playAgain').addEventListener('click', ()=> { document.location.reload(); });
+  // --- Improved feedback: manual close (X, outside click, Esc) + longer timer with countdown ---
+  const AUTO_CLOSE_MS=4500; // adjust this to taste
+
+  function showFeedback(ok,msg,explain){
+    return new Promise(resolve=>{
+      const o=$('#overlay'), box=$('#fbox'), close=$('#closex'), count=$('#count');
+      box.className='fbox '+(ok?'correct':'incorrect');
+      $('#ficon').textContent=ok?'✓':'✗';
+      $('#fmsg').textContent=msg; $('#explain').textContent=explain||'';
+      let remaining = Math.floor(AUTO_CLOSE_MS/1000);
+      count.textContent = remaining;
+      o.classList.add('show');
+
+      // countdown
+      const tick = setInterval(()=>{ remaining--; if(remaining>=0){count.textContent=remaining;} },1000);
+
+      const cleanup=()=>{
+        clearInterval(tick);
+        o.classList.remove('show');
+        o.removeEventListener('click',onOutside);
+        close.removeEventListener('click',onClose);
+        document.removeEventListener('keydown',onEsc);
+        clearTimeout(timer);
+        resolve();
+      };
+      const onOutside=e=>{ if(e.target===o) cleanup(); };
+      const onClose=()=>cleanup();
+      const onEsc=e=>{ if(e.key==='Escape') cleanup(); };
+      o.addEventListener('click',onOutside);
+      close.addEventListener('click',onClose);
+      document.addEventListener('keydown',onEsc);
+
+      const timer=setTimeout(()=>cleanup(),AUTO_CLOSE_MS);
+    });
+  }
+
+  // wire
+  document.getElementById('startQuick').addEventListener('click',()=>startGame(10));
+  document.getElementById('startFull').addEventListener('click',()=>startGame(36));
+  document.getElementById('playAgain').addEventListener('click',()=>document.location.reload());
 </script>
 </body>
 </html>
