@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI & Cognitive Biases: An Interactive Learning Game</title>
+    <title>AI Cognitive Bias Matcher - PCA Presentation</title>
     <style>
         * {
             margin: 0;
@@ -14,45 +14,54 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
+            height: 100vh;
+            overflow: hidden;
             color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .container {
-            max-width: 1400px;
-            margin: 0 auto;
+            width: 95vw;
+            height: 95vh;
+            display: flex;
+            flex-direction: column;
         }
 
         /* Welcome Screen */
         .welcome-screen {
             background: white;
             border-radius: 20px;
-            padding: 60px 40px;
+            padding: 50px;
             text-align: center;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            animation: fadeIn 0.6s ease-in;
+            animation: fadeIn 0.5s ease-in;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
         }
 
         .welcome-screen h1 {
             color: #667eea;
-            font-size: 2.8em;
+            font-size: 3.5em;
             margin-bottom: 20px;
         }
 
         .welcome-screen h2 {
             color: #764ba2;
-            font-size: 1.8em;
+            font-size: 2em;
             margin-bottom: 30px;
             font-weight: 400;
         }
 
         .welcome-screen p {
-            font-size: 1.2em;
+            font-size: 1.4em;
             line-height: 1.8;
             color: #555;
-            margin-bottom: 20px;
-            max-width: 800px;
+            margin-bottom: 15px;
+            max-width: 900px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -61,11 +70,11 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 18px 50px;
-            font-size: 1.3em;
+            padding: 20px 60px;
+            font-size: 1.5em;
             border-radius: 50px;
             cursor: pointer;
-            margin-top: 30px;
+            margin-top: 40px;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
         }
@@ -78,20 +87,21 @@
         /* Game Screen */
         .game-screen {
             display: none;
-            animation: fadeIn 0.6s ease-in;
+            flex-direction: column;
+            height: 100%;
+            animation: fadeIn 0.5s ease-in;
         }
 
+        /* Header */
         .header {
             background: white;
             border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 30px;
+            padding: 20px 30px;
+            margin-bottom: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
         }
 
         .header h1 {
@@ -99,167 +109,185 @@
             font-size: 2em;
         }
 
-        .score-board {
+        .score-display {
             display: flex;
             gap: 30px;
             align-items: center;
+            font-size: 1.3em;
         }
 
-        .score-item {
-            text-align: center;
-        }
-
-        .score-item .label {
-            font-size: 0.9em;
-            color: #888;
-            margin-bottom: 5px;
-        }
-
-        .score-item .value {
-            font-size: 1.8em;
-            font-weight: bold;
+        .score-display span {
             color: #667eea;
+            font-weight: bold;
         }
 
+        /* Progress Bar */
+        .progress-container {
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+            height: 15px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50 0%, #8bc34a 100%);
+            transition: width 0.5s ease;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.8em;
+            line-height: 15px;
+        }
+
+        /* Main Game Area */
         .game-content {
+            flex: 1;
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
+            grid-template-rows: 1fr 1.5fr;
+            gap: 15px;
+            overflow: hidden;
         }
 
-        .scenarios-column, .fallacies-column {
+        /* Scenario Display */
+        .scenario-display {
             background: white;
             border-radius: 15px;
             padding: 30px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .column-title {
-            font-size: 1.5em;
-            color: #764ba2;
-            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             text-align: center;
+        }
+
+        .scenario-label {
+            color: #764ba2;
+            font-size: 1.2em;
             font-weight: 600;
-        }
-
-        .scenario-card {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            border-radius: 12px;
-            padding: 20px;
             margin-bottom: 15px;
-            cursor: move;
-            transition: all 0.3s ease;
-            border: 3px solid transparent;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .scenario-card:hover {
-            transform: translateX(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-        }
-
-        .scenario-card.dragging {
-            opacity: 0.5;
-            transform: rotate(5deg);
-        }
-
-        .scenario-card.matched {
-            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
-            cursor: default;
-            animation: matchSuccess 0.5s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .scenario-text {
-            font-size: 1.05em;
+            font-size: 1.6em;
             line-height: 1.6;
             color: #333;
+            max-width: 90%;
         }
 
-        .fallacy-slot {
-            background: #f8f9fa;
-            border: 3px dashed #ccc;
-            border-radius: 12px;
+        /* Bias Options Grid */
+        .bias-options {
+            background: white;
+            border-radius: 15px;
             padding: 20px;
-            margin-bottom: 15px;
-            min-height: 100px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow-y: auto;
+        }
+
+        .bias-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .bias-btn {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border: 3px solid transparent;
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
             transition: all 0.3s ease;
-            position: relative;
+            text-align: left;
+            font-size: 0.95em;
         }
 
-        .fallacy-slot.drag-over {
-            background: #e3f2fd;
+        .bias-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
             border-color: #667eea;
-            border-style: solid;
-            transform: scale(1.02);
         }
 
-        .fallacy-slot.filled {
+        .bias-btn.correct {
             background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
             border-color: #4caf50;
-            border-style: solid;
+            animation: correctPulse 0.5s ease;
+            pointer-events: none;
         }
 
-        .fallacy-slot.incorrect {
+        .bias-btn.incorrect {
             background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
             border-color: #f44336;
             animation: shake 0.5s ease;
         }
 
-        .fallacy-name {
+        .bias-btn.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .bias-icon {
+            font-size: 1.5em;
+            margin-right: 8px;
+        }
+
+        .bias-name {
             font-weight: 600;
             color: #667eea;
-            font-size: 1.2em;
-            margin-bottom: 10px;
         }
 
-        .fallacy-category {
-            font-size: 0.9em;
+        .bias-category {
+            font-size: 0.85em;
             color: #888;
-            font-style: italic;
+            margin-top: 3px;
         }
 
-        /* Feedback Messages */
-        .feedback {
+        /* Feedback Overlay */
+        .feedback-overlay {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            background: white;
-            padding: 40px 60px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
             z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback-overlay.show {
+            display: flex;
+        }
+
+        .feedback-box {
+            background: white;
+            padding: 60px 80px;
+            border-radius: 20px;
             text-align: center;
-            transition: transform 0.3s ease;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            animation: scaleIn 0.3s ease;
         }
 
-        .feedback.show {
-            transform: translate(-50%, -50%) scale(1);
+        .feedback-box h2 {
+            font-size: 4em;
+            margin-bottom: 20px;
         }
 
-        .feedback.correct {
-            border: 5px solid #4caf50;
-        }
-
-        .feedback.incorrect {
-            border: 5px solid #f44336;
-        }
-
-        .feedback h2 {
-            font-size: 2.5em;
-            margin-bottom: 15px;
-        }
-
-        .feedback.correct h2 {
+        .feedback-box.correct h2 {
             color: #4caf50;
         }
 
-        .feedback.incorrect h2 {
+        .feedback-box.incorrect h2 {
             color: #f44336;
         }
 
-        .feedback p {
-            font-size: 1.2em;
+        .feedback-box p {
+            font-size: 1.8em;
             color: #555;
         }
 
@@ -268,42 +296,44 @@
             display: none;
             background: white;
             border-radius: 20px;
-            padding: 60px 40px;
+            padding: 50px;
             text-align: center;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            animation: fadeIn 0.6s ease-in;
+            animation: fadeIn 0.5s ease-in;
+            height: 100%;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .completion-screen h1 {
             color: #4caf50;
-            font-size: 3em;
-            margin-bottom: 20px;
+            font-size: 4em;
+            margin-bottom: 30px;
         }
 
-        .completion-stats {
+        .final-stats {
             display: flex;
             justify-content: center;
             gap: 50px;
             margin: 40px 0;
-            flex-wrap: wrap;
         }
 
         .stat-box {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 30px 40px;
+            padding: 40px 50px;
             border-radius: 15px;
-            min-width: 200px;
+            min-width: 220px;
         }
 
-        .stat-box .stat-label {
-            font-size: 1em;
+        .stat-label {
+            font-size: 1.2em;
             margin-bottom: 10px;
             opacity: 0.9;
         }
 
-        .stat-box .stat-value {
-            font-size: 3em;
+        .stat-value {
+            font-size: 4em;
             font-weight: bold;
         }
 
@@ -311,8 +341,8 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 18px 50px;
-            font-size: 1.3em;
+            padding: 20px 60px;
+            font-size: 1.5em;
             border-radius: 50px;
             cursor: pointer;
             margin-top: 30px;
@@ -325,14 +355,18 @@
 
         /* Animations */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
-        @keyframes matchSuccess {
-            0% { transform: scale(1); }
+        @keyframes scaleIn {
+            from { transform: scale(0.8); }
+            to { transform: scale(1); }
+        }
+
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
             50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
         }
 
         @keyframes shake {
@@ -340,358 +374,137 @@
             25% { transform: translateX(-10px); }
             75% { transform: translateX(10px); }
         }
-
-        /* Responsive Design */
-        @media (max-width: 968px) {
-            .game-content {
-                grid-template-columns: 1fr;
-            }
-
-            .welcome-screen h1 {
-                font-size: 2em;
-            }
-
-            .header {
-                flex-direction: column;
-                text-align: center;
-            }
-        }
-
-        /* Progress Bar */
-        .progress-container {
-            width: 100%;
-            background: #e0e0e0;
-            border-radius: 10px;
-            height: 20px;
-            margin: 20px 0;
-            overflow: hidden;
-        }
-
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #4caf50 0%, #8bc34a 100%);
-            transition: width 0.5s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 0.9em;
-        }
-
-        .instructions {
-            background: #fff3cd;
-            border: 2px solid #ffc107;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-            font-size: 1.05em;
-            color: #856404;
-        }
-
-        .reset-btn {
-            background: #f44336;
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background 0.3s ease;
-        }
-
-        .reset-btn:hover {
-            background: #d32f2f;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <!-- Welcome Screen -->
         <div class="welcome-screen" id="welcomeScreen">
-            <h1>🧠 AI & Cognitive Biases</h1>
-            <h2>An Interactive Learning Experience</h2>
-            <p><strong>Welcome, Counselors!</strong></p>
-            <p>Understanding our cognitive biases about AI helps us serve clients more effectively and embrace technological opportunities without fear or denial.</p>
-            <p>In this interactive game, you'll match real-world scenarios with the cognitive biases and fallacies that might be at play. Drag each scenario to the correct fallacy name.</p>
-            <p><strong>Ready to challenge your thinking?</strong></p>
-            <button class="start-btn" onclick="startGame()">🚀 Start Learning</button>
+            <h1>🧠 AI Cognitive Bias Matcher</h1>
+            <h2>Interactive Learning Game for Counselors</h2>
+            <p><strong>Test your knowledge!</strong></p>
+            <p>Read each counseling scenario and identify which cognitive bias is at play.</p>
+            <p>Click your answer from the options below. Fast-paced and fun!</p>
+            <button class="start-btn" onclick="startGame()">🚀 Let's Play!</button>
         </div>
 
         <!-- Game Screen -->
         <div class="game-screen" id="gameScreen">
             <div class="header">
-                <h1>🎯 Match the Bias</h1>
-                <div class="score-board">
-                    <div class="score-item">
-                        <div class="label">Correct</div>
-                        <div class="value" id="correctCount">0</div>
-                    </div>
-                    <div class="score-item">
-                        <div class="label">Remaining</div>
-                        <div class="value" id="remainingCount">12</div>
-                    </div>
-                    <button class="reset-btn" onclick="resetGame()">↻ Reset Round</button>
+                <h1>🎯 Match the Cognitive Bias</h1>
+                <div class="score-display">
+                    <div>Score: <span id="scoreValue">0</span> / <span id="totalValue">10</span></div>
+                    <div>Accuracy: <span id="accuracyValue">0%</span></div>
                 </div>
             </div>
 
             <div class="progress-container">
-                <div class="progress-bar" id="progressBar" style="width: 0%">0%</div>
-            </div>
-
-            <div class="instructions">
-                <strong>📋 Instructions:</strong> Drag each counseling scenario from the left and drop it onto the matching cognitive bias on the right. Get immediate feedback on your matches!
+                <div class="progress-bar" id="progressBar" style="width: 0%"></div>
             </div>
 
             <div class="game-content">
-                <div class="scenarios-column">
-                    <h3 class="column-title">Counseling Scenarios</h3>
-                    <div id="scenariosContainer"></div>
+                <div class="scenario-display">
+                    <div class="scenario-label">🎭 Counseling Scenario</div>
+                    <div class="scenario-text" id="scenarioText"></div>
                 </div>
 
-                <div class="fallacies-column">
-                    <h3 class="column-title">Cognitive Biases & Fallacies</h3>
-                    <div id="fallaciesContainer"></div>
+                <div class="bias-options">
+                    <div class="bias-grid" id="biasGrid"></div>
                 </div>
             </div>
         </div>
 
         <!-- Completion Screen -->
         <div class="completion-screen" id="completionScreen">
-            <h1>🎉 Congratulations!</h1>
-            <h2>You've completed this round!</h2>
+            <h1>🎉 Game Complete!</h1>
+            <h2>Excellent Work, Counselors!</h2>
             
-            <div class="completion-stats">
+            <div class="final-stats">
                 <div class="stat-box">
-                    <div class="stat-label">Correct Matches</div>
-                    <div class="stat-value" id="finalCorrect">0</div>
+                    <div class="stat-label">Final Score</div>
+                    <div class="stat-value" id="finalScore">0</div>
                 </div>
                 <div class="stat-box">
                     <div class="stat-label">Accuracy</div>
                     <div class="stat-value" id="finalAccuracy">0%</div>
                 </div>
-                <div class="stat-box">
-                    <div class="stat-label">Total Attempts</div>
-                    <div class="stat-value" id="finalAttempts">0</div>
-                </div>
             </div>
 
-            <p style="font-size: 1.3em; color: #555; margin: 30px 0;">
-                Understanding these biases helps us serve clients better and embrace AI thoughtfully.
+            <p style="font-size: 1.5em; color: #555; margin: 30px 0;">
+                Understanding these biases helps us embrace AI thoughtfully in our practice!
             </p>
 
-            <button class="restart-btn" onclick="nextRound()">▶ Next Round (New Scenarios)</button>
-            <button class="restart-btn" onclick="location.reload()" style="margin-left: 20px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">🔄 Start Over</button>
+            <button class="restart-btn" onclick="location.reload()">🔄 Play Again</button>
         </div>
     </div>
 
-    <!-- Feedback Popup -->
-    <div class="feedback" id="feedback"></div>
+    <!-- Feedback Overlay -->
+    <div class="feedback-overlay" id="feedbackOverlay">
+        <div class="feedback-box" id="feedbackBox">
+            <h2 id="feedbackEmoji"></h2>
+            <p id="feedbackText"></p>
+        </div>
+    </div>
 
     <script>
-        // Complete dataset of all 36 biases with counseling-specific scenarios
-        const allBiasData = [
-            // Set 1: Resistance & Denial (7)
-            {
-                fallacy: "Status-quo bias",
-                category: "Resistance & Denial",
-                scenario: "A therapist insists on using only paper intake forms because 'my current system works fine,' despite clients requesting digital options and missing appointments due to paperwork delays."
-            },
-            {
-                fallacy: "Denial / Minimization",
-                category: "Resistance & Denial",
-                scenario: "A clinical supervisor dismisses AI-assisted note-taking as 'just a fad' even after three colleagues report saving 5+ hours weekly and having more energy for client care."
-            },
-            {
-                fallacy: "Normalcy bias",
-                category: "Resistance & Denial",
-                scenario: "A counseling practice owner plans a 5-year expansion assuming AI capabilities will stay the same, ignoring monthly breakthroughs in mental health tech reported in professional journals."
-            },
-            {
-                fallacy: "Preemptive dismissal",
-                category: "Resistance & Denial",
-                scenario: "Before attending a workshop on AI tools for therapists, a counselor declares 'machines can never understand emotions' and decides the training will be useless."
-            },
-            {
-                fallacy: "Sophisticated denial / Rationalization",
-                category: "Resistance & Denial",
-                scenario: "A psychologist creates elaborate arguments about 'the sacred therapeutic relationship' to avoid learning AI documentation tools, despite spending 2 hours nightly on paperwork instead of self-care."
-            },
-            {
-                fallacy: "Appeal to Tradition fallacy",
-                category: "Resistance & Denial",
-                scenario: "A counselor argues against telehealth platforms with AI scheduling because 'therapists have always met clients face-to-face for 100 years, and we shouldn't change that now.'"
-            },
-            {
-                fallacy: "Avoidance/Equity bias",
-                category: "Resistance & Denial",
-                scenario: "A therapy clinic serves only affluent clients who can afford in-person sessions, refusing to adopt AI-enhanced teletherapy that could reach underserved rural communities."
-            },
-
-            // Set 2: Fear & Threat-Based (5)
-            {
-                fallacy: "Catastrophizing / All-or-nothing thinking",
-                category: "Fear & Threat",
-                scenario: "A counselor hears about AI therapy chatbots and immediately concludes 'this is the end of our profession—we'll all be replaced within months,' refusing to explore how AI might assist rather than replace."
-            },
-            {
-                fallacy: "Low exposure = high fear",
-                category: "Fear & Threat",
-                scenario: "A therapist who has never tried AI tools expresses intense anxiety about 'robots taking over therapy' but becomes curious and calm after a 20-minute demo of AI transcription."
-            },
-            {
-                fallacy: "Competence threat / Identity protection",
-                category: "Fear & Threat",
-                scenario: "When AI diagnostic support tools are introduced, a senior therapist argues passionately that 'using technology shows we're not real clinicians' to protect their sense of expertise."
-            },
-            {
-                fallacy: "Extinction terror / Doomsday bias",
-                category: "Fear & Threat",
-                scenario: "A counselor becomes obsessed with articles predicting 'AI will eliminate all therapy jobs by 2030,' checking daily for apocalyptic news rather than learning adaptive skills."
-            },
-            {
-                fallacy: "Fear of the Unknown",
-                category: "Fear & Threat",
-                scenario: "A therapist avoids even reading about AI mental health tools because the unfamiliarity makes them anxious, preferring to stay in their comfort zone regardless of client needs."
-            },
-
-            // Set 3: Information Processing (7)
-            {
-                fallacy: "Availability bias / Availability heuristic",
-                category: "Information Processing",
-                scenario: "After reading one viral article about an AI chatbot giving harmful advice, a counselor assumes all AI mental health tools are dangerous, ignoring thousands of successful clinical implementations."
-            },
-            {
-                fallacy: "Confirmation bias",
-                category: "Information Processing",
-                scenario: "A therapist skeptical of AI only reads articles criticizing mental health technology while ignoring peer-reviewed studies showing positive outcomes from AI-assisted interventions."
-            },
-            {
-                fallacy: "Cognitive dissonance",
-                category: "Information Processing",
-                scenario: "A counselor who claims 'AI has no place in therapy' feels uncomfortable when their favorite professional development platform uses AI to personalize course recommendations and becomes defensive."
-            },
-            {
-                fallacy: "Cognitive closure",
-                category: "Information Processing",
-                scenario: "When asked about AI in counseling, a therapist quickly declares 'it's either good or bad—I need to decide now' instead of exploring the nuanced implications over time."
-            },
-            {
-                fallacy: "Low tolerance for ambiguity",
-                category: "Information Processing",
-                scenario: "A supervisor demands absolute certainty about AI's future impact on therapy before considering any pilot program, unable to proceed with reasonable uncertainty."
-            },
-            {
-                fallacy: "Red herring",
-                category: "Information Processing",
-                scenario: "During a discussion about using AI for scheduling efficiency, a therapist derails the conversation by debating whether AI has 'true consciousness,' avoiding practical planning."
-            },
-            {
-                fallacy: "Notrososcopic fallacy",
-                category: "Information Processing",
-                scenario: "A counselor fixates on AI's lack of empathy while ignoring how AI administrative tools could give them 10 more hours weekly for actual empathetic client contact."
-            },
-
-            // Set 4: Decision-Making & Agency (3)
-            {
-                fallacy: "Agency bias",
-                category: "Decision-Making & Agency",
-                scenario: "A therapy group spends six months debating whether to try AI transcription without ever running a simple 2-week pilot that would provide real data about its usefulness."
-            },
-            {
-                fallacy: "Sunk Cost fallacy",
-                category: "Decision-Making & Agency",
-                scenario: "A counselor continues using an outdated practice management system because 'I invested so much time learning it' even though AI-enhanced alternatives would save hours and reduce errors."
-            },
-            {
-                fallacy: "False Dichotomy (Either/Or fallacy)",
-                category: "Decision-Making & Agency",
-                scenario: "A therapist insists 'we either embrace AI completely and lose our humanity, or reject it entirely and stay authentic,' ignoring the middle ground of thoughtful, selective integration."
-            },
-
-            // Set 5: Existential & Identity (5)
-            {
-                fallacy: "Ontological anchoring / shock",
-                category: "Existential & Identity",
-                scenario: "A seasoned therapist experiences profound disorientation realizing AI can draft clinical summaries as well as they can, struggling to reconcile this with their sense of professional identity."
-            },
-            {
-                fallacy: "Memory reconsolidation",
-                category: "Existential & Identity",
-                scenario: "A counselor updates their belief that 'technology always depersonalizes care' after using AI tools that actually increase client face-time, causing temporary mental discomfort during the shift."
-            },
-            {
-                fallacy: "Preserving Human Uniqueness",
-                category: "Existential & Identity",
-                scenario: "A therapist insists 'humans are inherently better at therapy' as a psychological comfort, even when AI-supported interventions show equal or better outcomes in certain contexts."
-            },
-            {
-                fallacy: "Anthropocentrism",
-                category: "Existential & Identity",
-                scenario: "A counselor dismisses AI mood tracking apps because 'only humans can understand emotions,' excluding the possibility that pattern recognition might complement human intuition."
-            },
-            {
-                fallacy: "Loss of economic agency",
-                category: "Existential & Identity",
-                scenario: "A newly licensed therapist lies awake worrying 'AI will make my degree worthless' instead of exploring how to develop AI-complementary skills that increase their marketability."
-            },
-
-            // Set 6: Emotional Dysregulation & Attachment (4)
-            {
-                fallacy: "Digital self-harm / Rage farming",
-                category: "Emotional Dysregulation",
-                scenario: "A therapist repeatedly watches videos predicting 'AI will destroy mental health care' to fuel their anger and anxiety, spending hours in outrage rather than constructive learning."
-            },
-            {
-                fallacy: "Anthropomorphizing",
-                category: "Emotional Dysregulation",
-                scenario: "A counselor treats an AI chatbot as if it has feelings and intentions, telling colleagues 'the AI is trying to replace us' as if the tool has motivations rather than functions."
-            },
-            {
-                fallacy: "Perfectionism combined with social inhibition",
-                category: "Emotional Dysregulation",
-                scenario: "A therapist prefers consulting AI for clinical advice over peer consultation because 'AI never judges my questions,' avoiding the valuable but imperfect feedback from colleagues."
-            },
-            {
-                fallacy: "Projection",
-                category: "Emotional Dysregulation",
-                scenario: "A counselor who secretly fears inadequacy accuses others who use AI tools of 'feeling threatened and trying to cheat,' projecting their own insecurities onto colleagues."
-            },
-
-            // Set 7: Extreme/Pathological (5)
-            {
-                fallacy: "Conspiratorial pattern-finding",
-                category: "Extreme/Pathological",
-                scenario: "A therapist believes tech companies are 'secretly programming AI to destroy the counseling profession' and sees evidence of this conspiracy in every AI mental health announcement."
-            },
-            {
-                fallacy: "Magical thinking",
-                category: "Extreme/Pathological",
-                scenario: "A counselor believes AI has mystical powers to read minds and predict the future, far beyond what the technology actually does, leading to either unrealistic fear or inflated expectations."
-            },
-            {
-                fallacy: "Self-referential collapse",
-                category: "Extreme/Pathological",
-                scenario: "A therapist spends hours daily asking AI to validate increasingly detached theories about therapy, creating an isolated intellectual bubble disconnected from clinical reality and peer feedback."
-            },
-            {
-                fallacy: "Grandiosity / Specialness bias",
-                category: "Extreme/Pathological",
-                scenario: "A counselor believes AI has 'chosen them' to receive special insights about the future of therapy, claiming a unique destiny that sets them apart from 'ordinary' colleagues."
-            },
-            {
-                fallacy: "Ideological isolation",
-                category: "Extreme/Pathological",
-                scenario: "A therapist stops attending peer supervision, believing only AI understands their 'revolutionary' views on mental health, cutting themselves off from professional community."
-            }
+        // Complete 36 Bias Dataset with Icons - EXACT wording from your list
+        const allBiases = [
+            // Resistance & Denial (7)
+            { name: "Status-quo bias", category: "Resistance & Denial", icon: "🔒", scenario: "A therapist insists on using only paper intake forms because 'my current system works fine,' despite clients requesting digital options and missing appointments due to paperwork delays." },
+            { name: "Denial / Minimization", category: "Resistance & Denial", icon: "🙈", scenario: "A clinical supervisor dismisses AI-assisted note-taking as 'just a fad' even after three colleagues report saving 5+ hours weekly and having more energy for client care." },
+            { name: "Normalcy bias", category: "Resistance & Denial", icon: "📅", scenario: "A counseling practice owner plans a 5-year expansion assuming AI capabilities will stay the same, ignoring monthly breakthroughs in mental health tech reported in professional journals." },
+            { name: "Preemptive dismissal", category: "Resistance & Denial", icon: "🚫", scenario: "Before attending a workshop on AI tools for therapists, a counselor declares 'machines can never understand emotions' and decides the training will be useless." },
+            { name: "Sophisticated denial / Rationalization", category: "Resistance & Denial", icon: "🎭", scenario: "A psychologist creates elaborate arguments about 'the sacred therapeutic relationship' to avoid learning AI documentation tools, despite spending 2 hours nightly on paperwork instead of self-care." },
+            { name: "Appeal to Tradition fallacy", category: "Resistance & Denial", icon: "📜", scenario: "A counselor argues against telehealth platforms with AI scheduling because 'therapists have always met clients face-to-face for 100 years, and we shouldn't change that now.'" },
+            { name: "Avoidance/Equity bias", category: "Resistance & Denial", icon: "🚷", scenario: "A therapy clinic serves only affluent clients who can afford in-person sessions, refusing to adopt AI-enhanced teletherapy that could reach underserved rural communities." },
+            
+            // Fear & Threat (5)
+            { name: "Catastrophizing / All-or-nothing thinking", category: "Fear & Threat", icon: "💥", scenario: "A counselor hears about AI therapy chatbots and immediately concludes 'this is the end of our profession—we'll all be replaced within months,' refusing to explore how AI might assist rather than replace." },
+            { name: "Low exposure = high fear", category: "Fear & Threat", icon: "😰", scenario: "A therapist who has never tried AI tools expresses intense anxiety about 'robots taking over therapy' but becomes curious and calm after a 20-minute demo of AI transcription." },
+            { name: "Competence threat / Identity protection", category: "Fear & Threat", icon: "🛡️", scenario: "When AI diagnostic support tools are introduced, a senior therapist argues passionately that 'using technology shows we're not real clinicians' to protect their sense of expertise." },
+            { name: "Extinction terror / Doomsday bias", category: "Fear & Threat", icon: "☠️", scenario: "A counselor becomes obsessed with articles predicting 'AI will eliminate all therapy jobs by 2030,' checking daily for apocalyptic news rather than learning adaptive skills." },
+            { name: "Fear of the Unknown", category: "Fear & Threat", icon: "❓", scenario: "A therapist avoids even reading about AI mental health tools because the unfamiliarity makes them anxious, preferring to stay in their comfort zone regardless of client needs." },
+            
+            // Information Processing (7)
+            { name: "Availability bias / Availability heuristic", category: "Information Processing", icon: "📰", scenario: "After reading one viral article about an AI chatbot giving harmful advice, a counselor assumes all AI mental health tools are dangerous, ignoring thousands of successful clinical implementations." },
+            { name: "Confirmation bias", category: "Information Processing", icon: "🔍", scenario: "A therapist skeptical of AI only reads articles criticizing mental health technology while ignoring peer-reviewed studies showing positive outcomes from AI-assisted interventions." },
+            { name: "Cognitive dissonance", category: "Information Processing", icon: "😵", scenario: "A counselor who claims 'AI has no place in therapy' feels uncomfortable when their favorite professional development platform uses AI to personalize course recommendations and becomes defensive." },
+            { name: "Cognitive closure", category: "Information Processing", icon: "🚪", scenario: "When asked about AI in counseling, a therapist quickly declares 'it's either good or bad—I need to decide now' instead of exploring the nuanced implications over time." },
+            { name: "Low tolerance for ambiguity", category: "Information Processing", icon: "⚖️", scenario: "A supervisor demands absolute certainty about AI's future impact on therapy before considering any pilot program, unable to proceed with reasonable uncertainty." },
+            { name: "Red herring", category: "Information Processing", icon: "🐟", scenario: "During a discussion about using AI for scheduling efficiency, a therapist derails the conversation by debating whether AI has 'true consciousness,' avoiding practical planning." },
+            { name: "Notrososcopic fallacy", category: "Information Processing", icon: "🔬", scenario: "A counselor fixates on AI's lack of empathy while ignoring how AI administrative tools could give them 10 more hours weekly for actual empathetic client contact." },
+            
+            // Decision-Making & Agency (3)
+            { name: "Agency bias", category: "Decision-Making & Agency", icon: "🤷", scenario: "A therapy group spends six months debating whether to try AI transcription without ever running a simple 2-week pilot that would provide real data about its usefulness." },
+            { name: "Sunk Cost fallacy", category: "Decision-Making & Agency", icon: "💸", scenario: "A counselor continues using an outdated practice management system because 'I invested so much time learning it' even though AI-enhanced alternatives would save hours and reduce errors." },
+            { name: "False Dichotomy (Either/Or fallacy)", category: "Decision-Making & Agency", icon: "⚡", scenario: "A therapist insists 'we either embrace AI completely and lose our humanity, or reject it entirely and stay authentic,' ignoring the middle ground of thoughtful, selective integration." },
+            
+            // Existential & Identity (5)
+            { name: "Ontological anchoring / shock", category: "Existential & Identity", icon: "🌊", scenario: "A seasoned therapist experiences profound disorientation realizing AI can draft clinical summaries as well as they can, struggling to reconcile this with their sense of professional identity." },
+            { name: "Memory reconsolidation", category: "Existential & Identity", icon: "🧩", scenario: "A counselor updates their belief that 'technology always depersonalizes care' after using AI tools that actually increase client face-time, causing temporary mental discomfort during the shift." },
+            { name: "Preserving Human Uniqueness", category: "Existential & Identity", icon: "👤", scenario: "A therapist insists 'humans are inherently better at therapy' as a psychological comfort, even when AI-supported interventions show equal or better outcomes in certain contexts." },
+            { name: "Anthropocentrism", category: "Existential & Identity", icon: "🧑", scenario: "A counselor dismisses AI mood tracking apps because 'only humans can understand emotions,' excluding the possibility that pattern recognition might complement human intuition." },
+            { name: "Loss of economic agency", category: "Existential & Identity", icon: "💼", scenario: "A newly licensed therapist lies awake worrying 'AI will make my degree worthless' instead of exploring how to develop AI-complementary skills that increase their marketability." },
+            
+            // Emotional Dysregulation (4)
+            { name: "Digital self-harm / Rage farming", category: "Emotional Dysregulation", icon: "😡", scenario: "A therapist repeatedly watches videos predicting 'AI will destroy mental health care' to fuel their anger and anxiety, spending hours in outrage rather than constructive learning." },
+            { name: "Anthropomorphizing", category: "Emotional Dysregulation", icon: "🤖", scenario: "A counselor treats an AI chatbot as if it has feelings and intentions, telling colleagues 'the AI is trying to replace us' as if the tool has motivations rather than functions." },
+            { name: "Perfectionism combined with social inhibition", category: "Emotional Dysregulation", icon: "✨", scenario: "A therapist prefers consulting AI for clinical advice over peer consultation because 'AI never judges my questions,' avoiding the valuable but imperfect feedback from colleagues." },
+            { name: "Projection", category: "Emotional Dysregulation", icon: "🪞", scenario: "A counselor who secretly fears inadequacy accuses others who use AI tools of 'feeling threatened and trying to cheat,' projecting their own insecurities onto colleagues." },
+            
+            // Extreme/Pathological (5)
+            { name: "Conspiratorial pattern-finding", category: "Extreme/Pathological", icon: "🕵️", scenario: "A therapist believes tech companies are 'secretly programming AI to destroy the counseling profession' and sees evidence of this conspiracy in every AI mental health announcement." },
+            { name: "Magical thinking", category: "Extreme/Pathological", icon: "✨", scenario: "A counselor believes AI has mystical powers to read minds and predict the future, far beyond what the technology actually does, leading to either unrealistic fear or inflated expectations." },
+            { name: "Self-referential collapse", category: "Extreme/Pathological", icon: "🌀", scenario: "A therapist spends hours daily asking AI to validate increasingly detached theories about therapy, creating an isolated intellectual bubble disconnected from clinical reality and peer feedback." },
+            { name: "Grandiosity / Specialness bias", category: "Extreme/Pathological", icon: "👑", scenario: "A counselor believes AI has 'chosen them' to receive special insights about the future of therapy, claiming a unique destiny that sets them apart from 'ordinary' colleagues." },
+            { name: "Ideological isolation", category: "Extreme/Pathological", icon: "🏝️", scenario: "A therapist stops attending peer supervision, believing only AI understands their 'revolutionary' views on mental health, cutting themselves off from professional community." }
         ];
 
-        let currentRound = [];
-        let currentSet = 0;
-        let correctCount = 0;
+        let currentScenarioIndex = 0;
+        let score = 0;
         let totalAttempts = 0;
-        let matchedPairs = [];
-        const itemsPerRound = 12;
+        let gameScenarios = [];
+        const questionsPerGame = 10;
 
         function shuffleArray(array) {
             const newArray = [...array];
@@ -702,184 +515,117 @@
             return newArray;
         }
 
-        function getNextRound() {
-            // Shuffle all data and take the next itemsPerRound items
-            const shuffled = shuffleArray(allBiasData);
-            return shuffled.slice(0, itemsPerRound);
-        }
-
         function startGame() {
             document.getElementById('welcomeScreen').style.display = 'none';
-            document.getElementById('gameScreen').style.display = 'block';
-            loadRound();
-        }
-
-        function loadRound() {
-            currentRound = getNextRound();
-            correctCount = 0;
+            document.getElementById('gameScreen').style.display = 'flex';
+            
+            // Shuffle and select scenarios for this game
+            gameScenarios = shuffleArray(allBiases).slice(0, questionsPerGame);
+            currentScenarioIndex = 0;
+            score = 0;
             totalAttempts = 0;
-            matchedPairs = [];
             
-            renderScenarios();
-            renderFallacies();
-            updateScore();
+            loadQuestion();
+            renderBiasOptions();
         }
 
-        function renderScenarios() {
-            const container = document.getElementById('scenariosContainer');
-            const shuffledScenarios = shuffleArray(currentRound);
+        function loadQuestion() {
+            const scenario = gameScenarios[currentScenarioIndex];
+            document.getElementById('scenarioText').textContent = scenario.scenario;
+            document.getElementById('totalValue').textContent = questionsPerGame;
+            updateProgress();
+        }
+
+        function renderBiasOptions() {
+            const grid = document.getElementById('biasGrid');
+            const shuffledBiases = shuffleArray(allBiases);
             
-            container.innerHTML = shuffledScenarios.map((item, index) => `
-                <div class="scenario-card" draggable="true" data-fallacy="${item.fallacy}" id="scenario-${index}">
-                    <div class="scenario-text">${item.scenario}</div>
-                </div>
+            grid.innerHTML = shuffledBiases.map(bias => `
+                <button class="bias-btn" onclick="selectBias('${bias.name.replace(/'/g, "\\'")}')">
+                    <span class="bias-icon">${bias.icon}</span>
+                    <div>
+                        <div class="bias-name">${bias.name}</div>
+                        <div class="bias-category">${bias.category}</div>
+                    </div>
+                </button>
             `).join('');
-
-            // Add drag event listeners
-            document.querySelectorAll('.scenario-card').forEach(card => {
-                card.addEventListener('dragstart', handleDragStart);
-                card.addEventListener('dragend', handleDragEnd);
-            });
         }
 
-        function renderFallacies() {
-            const container = document.getElementById('fallaciesContainer');
-            const shuffledFallacies = shuffleArray(currentRound);
+        function selectBias(selectedBias) {
+            const correctBias = gameScenarios[currentScenarioIndex].name;
+            const isCorrect = selectedBias === correctBias;
             
-            container.innerHTML = shuffledFallacies.map((item, index) => `
-                <div class="fallacy-slot" data-fallacy="${item.fallacy}" id="fallacy-${index}">
-                    <div class="fallacy-name">${item.fallacy}</div>
-                    <div class="fallacy-category">${item.category}</div>
-                </div>
-            `).join('');
-
-            // Add drop event listeners
-            document.querySelectorAll('.fallacy-slot').forEach(slot => {
-                slot.addEventListener('dragover', handleDragOver);
-                slot.addEventListener('drop', handleDrop);
-                slot.addEventListener('dragleave', handleDragLeave);
-            });
-        }
-
-        let draggedElement = null;
-
-        function handleDragStart(e) {
-            if (e.target.classList.contains('matched')) return;
-            draggedElement = e.target;
-            e.target.classList.add('dragging');
-            e.dataTransfer.effectAllowed = 'move';
-        }
-
-        function handleDragEnd(e) {
-            e.target.classList.remove('dragging');
-        }
-
-        function handleDragOver(e) {
-            if (e.preventDefault) {
-                e.preventDefault();
-            }
-            if (!e.currentTarget.classList.contains('filled')) {
-                e.currentTarget.classList.add('drag-over');
-            }
-            e.dataTransfer.dropEffect = 'move';
-            return false;
-        }
-
-        function handleDragLeave(e) {
-            e.currentTarget.classList.remove('drag-over');
-        }
-
-        function handleDrop(e) {
-            if (e.stopPropagation) {
-                e.stopPropagation();
-            }
-            e.preventDefault();
-
-            const slot = e.currentTarget;
-            slot.classList.remove('drag-over');
-
-            if (slot.classList.contains('filled')) {
-                showFeedback(false, 'This slot is already filled!');
-                return false;
-            }
-
-            const scenarioFallacy = draggedElement.getAttribute('data-fallacy');
-            const slotFallacy = slot.getAttribute('data-fallacy');
-
             totalAttempts++;
-
-            if (scenarioFallacy === slotFallacy) {
-                // Correct match
-                correctCount++;
-                matchedPairs.push(scenarioFallacy);
-                
-                draggedElement.classList.add('matched');
-                slot.classList.add('filled');
-                slot.appendChild(draggedElement);
-                
-                showFeedback(true, `Excellent! This is indeed ${scenarioFallacy}!`);
-                updateScore();
-
-                if (matchedPairs.length === currentRound.length) {
-                    setTimeout(showCompletion, 1000);
+            
+            // Find and highlight the clicked button
+            const buttons = document.querySelectorAll('.bias-btn');
+            buttons.forEach(btn => {
+                const btnName = btn.querySelector('.bias-name').textContent;
+                if (btnName === selectedBias) {
+                    btn.classList.add(isCorrect ? 'correct' : 'incorrect');
                 }
+                btn.classList.add('disabled');
+            });
+            
+            if (isCorrect) {
+                score++;
+                showFeedback(true, `✓ Correct! That's ${correctBias}!`);
             } else {
-                // Incorrect match
-                slot.classList.add('incorrect');
-                setTimeout(() => {
-                    slot.classList.remove('incorrect');
-                }, 500);
-                
-                showFeedback(false, `Not quite. Try another match!`);
+                showFeedback(false, `✗ Not quite. The answer was: ${correctBias}`);
             }
-
-            return false;
+            
+            updateScore();
+            
+            setTimeout(() => {
+                currentScenarioIndex++;
+                if (currentScenarioIndex < gameScenarios.length) {
+                    loadQuestion();
+                    renderBiasOptions();
+                } else {
+                    showCompletion();
+                }
+            }, 2500);
         }
 
         function showFeedback(isCorrect, message) {
-            const feedback = document.getElementById('feedback');
-            feedback.className = 'feedback ' + (isCorrect ? 'correct' : 'incorrect');
-            feedback.innerHTML = `
-                <h2>${isCorrect ? '✓ Correct!' : '✗ Try Again'}</h2>
-                <p>${message}</p>
-            `;
-            feedback.classList.add('show');
+            const overlay = document.getElementById('feedbackOverlay');
+            const box = document.getElementById('feedbackBox');
+            const emoji = document.getElementById('feedbackEmoji');
+            const text = document.getElementById('feedbackText');
+            
+            box.className = 'feedback-box ' + (isCorrect ? 'correct' : 'incorrect');
+            emoji.textContent = isCorrect ? '✓' : '✗';
+            text.textContent = message;
+            
+            overlay.classList.add('show');
             
             setTimeout(() => {
-                feedback.classList.remove('show');
-            }, 1500);
+                overlay.classList.remove('show');
+            }, 2000);
         }
 
         function updateScore() {
-            document.getElementById('correctCount').textContent = correctCount;
-            document.getElementById('remainingCount').textContent = currentRound.length - correctCount;
-            
-            const progress = (correctCount / currentRound.length) * 100;
+            document.getElementById('scoreValue').textContent = score;
+            const accuracy = totalAttempts > 0 ? Math.round((score / totalAttempts) * 100) : 0;
+            document.getElementById('accuracyValue').textContent = accuracy + '%';
+        }
+
+        function updateProgress() {
+            const progress = ((currentScenarioIndex + 1) / questionsPerGame) * 100;
             const progressBar = document.getElementById('progressBar');
             progressBar.style.width = progress + '%';
-            progressBar.textContent = Math.round(progress) + '%';
+            progressBar.textContent = `Question ${currentScenarioIndex + 1} of ${questionsPerGame}`;
         }
 
         function showCompletion() {
-            document.getElementById('gameScreen').style.display = 'none';
-            document.getElementById('completionScreen').style.display = 'block';
-            
-            const accuracy = Math.round((correctCount / totalAttempts) * 100);
-            
-            document.getElementById('finalCorrect').textContent = correctCount;
-            document.getElementById('finalAccuracy').textContent = accuracy + '%';
-            document.getElementById('finalAttempts').textContent = totalAttempts;
-        }
-
-        function nextRound() {
-            document.getElementById('completionScreen').style.display = 'none';
-            document.getElementById('gameScreen').style.display = 'block';
-            currentSet++;
-            loadRound();
-        }
-
-        function resetGame() {
-            loadRound();
+            setTimeout(() => {
+                document.getElementById('gameScreen').style.display = 'none';
+                document.getElementById('completionScreen').style.display = 'flex';
+                
+                const accuracy = Math.round((score / totalAttempts) * 100);
+                document.getElementById('finalScore').textContent = `${score}/${questionsPerGame}`;
+                document.getElementById('finalAccuracy').textContent = accuracy + '%';
+            }, 500);
         }
     </script>
 </body>
