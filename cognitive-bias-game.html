@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Cognitive Bias Matcher - PCA Presentation (v4+)</title>
+  <title>AI Cognitive Bias Matcher - PCA Presentation (v5)</title>
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
     html,body{height:100%}
@@ -100,10 +100,10 @@
           <h2>Welcome, Counselors!</h2>
           <p>Understanding our cognitive biases about AI helps us serve clients more effectively and embrace technological opportunities without fear or denial.</p>
           <p>In this interactive game, you'll match real-world scenarios with the cognitive biases and fallacies that might be at play. <strong>Drag the scenario card onto the correct fallacy name</strong> (or click a tile to select).</p>
-          <p class="small">Quick Play gives you 10 randomized rounds. Full Deck uses all items in the simplified set (25).</p>
+          <p class="small">Quick Play gives you 10 randomized rounds. Full Deck uses all items in the complete set (36).</p>
           <div class="actions">
             <button class="btn" id="startQuick">🚀 Quick Play (10)</button>
-            <button class="btn secondary" id="startFull">🧩 Full Deck (25)</button>
+            <button class="btn secondary" id="startFull">🧩 Full Deck (36)</button>
           </div>
         </div>
       </div>
@@ -161,133 +161,188 @@
   </div>
 
 <script>
-  // === 25-item dataset (single bias each) with deeper counselor-tone scenarios and tile taglines ===
-  // Add images in /images; if not found, the <img> hides gracefully.
+  // === 36-item dataset, aligned to your scenarios with precise bias/fallacy matches ===
+  // Add optional images in /images; the <img> hides gracefully if not found.
   const DATA = [
     {name:"Status Quo Bias",cat:"Resistance",icon:"🔒",img:"status-quo.jpg",
      tag:"Preferring the familiar—even when a better path is clear.",
-     explain:`Tendency to stick with current routines because change feels costly or risky.`,
-     scenario:`“Paper has always worked,” says a therapist, waving off the portal her clients ask for—while no-shows rise and intakes get misfiled.`},
+     explain:`Tendency to keep current routines because change feels costly or risky.`,
+     scenario:`A therapist insists on using only paper intake forms because “my current system works fine,” despite clients requesting digital options and missing appointments due to paperwork delays.`},
 
-    {name:"Minimization",cat:"Defense",icon:"🙈",img:"minimization.jpg",
-     tag:"Downplaying disconfirming evidence to protect a stance.",
-     explain:`Reducing the significance of evidence that challenges one’s view.`,
-     scenario:`A supervisor smiles at three colleagues who saved hours with AI notes: “Cute trend.” He still spends late nights charting and calls it “just part of the job.”`},
+    {name:"Belief Perseverance",cat:"Reasoning",icon:"🧱",img:"belief-perseverance.jpg",
+     tag:"Clinging to a belief despite clear contrary evidence.",
+     explain:`Existing beliefs are maintained even after receiving disconfirming evidence.`,
+     scenario:`A clinical supervisor dismisses AI-assisted note-taking as “just a fad,” even after three colleagues report saving 5+ hours weekly and having more energy for client care.`},
 
     {name:"Normalcy Bias",cat:"Resistance",icon:"📅",img:"normalcy-bias.jpg",
      tag:"Assuming tomorrow will look like yesterday.",
      explain:`Underestimating the speed/impact of change; planning for continuity.`,
-     scenario:`A practice owner drafts a 5-year plan with zero tech shift—ignoring month-over-month clinical AI gains and payer policy updates.`},
+     scenario:`A counseling practice owner plans a 5-year expansion assuming AI capabilities will stay the same, ignoring monthly breakthroughs in mental health tech reported in professional journals.`},
 
-    {name:"Confirmation Bias",cat:"Reasoning",icon:"🔍",img:"confirmation-bias.jpg",
-     tag:"Seeking only what affirms what we already believe.",
-     explain:`Filtering for confirmatory evidence; neglecting disconfirming data.`,
-     scenario:`Before an AI training, a counselor searches “reasons AI harms therapy,” skims two critical posts, and decides the workshop “can’t teach me anything.”`},
+    {name:"Attitude Polarization",cat:"Reasoning",icon:"🌓",img:"attitude-polarization.jpg",
+     tag:"Pre‑judging; exposure to mixed info hardens the initial stance.",
+     explain:`Evaluating new information in a way that strengthens preexisting views.`,
+     scenario:`Before attending a workshop on AI tools for therapists, a counselor declares “machines can never understand emotions” and decides the training will be useless.`},
 
     {name:"Rationalization",cat:"Defense",icon:"🎭",img:"rationalization.jpg",
      tag:"Plausible-sounding excuses that mask avoidance.",
      explain:`Constructing reasons that soothe discomfort rather than reflect reality.`,
-     scenario:`“It threatens the therapeutic sacredness,” she says—then spends two exhausted hours nightly doing notes an assistant or tool could pre-draft.`},
+     scenario:`A psychologist creates elaborate arguments about “the sacred therapeutic relationship” to avoid learning AI documentation tools, despite spending 2 hours nightly on paperwork instead of self‑care.`},
 
     {name:"Appeal to Tradition",cat:"Fallacy",icon:"📜",img:"appeal-to-tradition.jpg",
      tag:"“We’ve always done it this way,” therefore it’s best.",
      explain:`Arguing from custom rather than evidence, outcomes, or values.`,
-     scenario:`“Therapy means face-to-face only,” he says, rejecting AI-assisted scheduling and telehealth that would help his night-shift clients.`},
+     scenario:`A counselor argues against telehealth platforms with AI scheduling because “therapists have always met clients face‑to‑face for 100 years, and we shouldn’t change that now.”`},
 
-    {name:"In-group Bias",cat:"Fairness",icon:"👥",img:"ingroup-bias.jpg",
+    {name:"In‑group Bias",cat:"Fairness",icon:"👥",img:"ingroup-bias.jpg",
      tag:"Serving those like us, overlooking those unlike us.",
      explain:`Favoring one’s own group—even when others could benefit.`,
-     scenario:`A clinic keeps a city-center caseload, declining AI-enabled rural tele-visits: “Not our model.” Waitlists outside town grow.`},
+     scenario:`A therapy clinic serves only affluent clients who can afford in‑person sessions, refusing to adopt AI‑enhanced teletherapy that could reach underserved rural communities.`},
 
     {name:"Catastrophizing",cat:"Distortion",icon:"💥",img:"catastrophizing.jpg",
      tag:"Jumping straight from change to doom.",
-     explain:`Overestimating worst-case outcomes; underweighting realistic positives.`,
-     scenario:`After a news clip on chatbots, a counselor whispers, “So this is how it ends,” closes the laptop, and stops exploring anything new.`},
+     explain:`Overestimating worst‑case outcomes while neglecting realistic positives.`,
+     scenario:`A counselor hears about AI therapy chatbots and immediately concludes “this is the end of our profession—we’ll all be replaced within months,” refusing to explore how AI might assist rather than replace.`},
 
     {name:"Ambiguity Aversion",cat:"Risk",icon:"😰",img:"ambiguity-aversion.jpg",
      tag:"Unknowns feel riskier than known flaws.",
      explain:`Preference for familiar risks over uncertain alternatives.`,
-     scenario:`Never trying a tool, a therapist imagines “robot takeover.” Twenty minutes with a demo shows it’s basically a dictation assistant.`},
+     scenario:`A therapist who has never tried AI tools expresses intense anxiety about “robots taking over therapy” but becomes curious and calm after a 20‑minute demo of AI transcription.`},
 
-    {name:"Identity Threat",cat:"Social",icon:"🛡️",img:"identity-threat.jpg",
+    {name:"Identity‑Protective Cognition",cat:"Social",icon:"🛡️",img:"identity-threat.jpg",
      tag:"Protecting status/role by rejecting new information.",
      explain:`Discarding evidence that seems to diminish one’s professional identity.`,
-     scenario:`“Real clinicians don’t need tech,” says a senior therapist when decision-support appears, avoiding it to keep his expert status intact.`},
+     scenario:`When AI diagnostic support tools are introduced, a senior therapist argues passionately that “using technology shows we’re not real clinicians” to protect their sense of expertise.`},
 
     {name:"Negativity Bias",cat:"Attention",icon:"📉",img:"negativity-bias.jpg",
      tag:"Bad news sticks; good news slides off.",
      explain:`Attending to and recalling negative information more strongly.`,
-     scenario:`She doom-scrolls “AI will end therapy” nightly, then feels too anxious to read the pilot results showing better follow-through.`},
+     scenario:`A counselor becomes obsessed with articles predicting “AI will eliminate all therapy jobs by 2030,” checking daily for apocalyptic news rather than learning adaptive skills.`},
+
+    {name:"Ostrich Effect (Information Avoidance)",cat:"Attention",icon:"🪶",img:"ostrich-effect.jpg",
+     tag:"Avoiding info that could cause psychological discomfort.",
+     explain:`Deliberately avoiding knowledge that could require change.`,
+     scenario:`A therapist avoids even reading about AI mental health tools because the unfamiliarity makes them anxious, preferring to stay in their comfort zone regardless of client needs.`},
 
     {name:"Availability Heuristic",cat:"Judgment",icon:"📰",img:"availability-heuristic.jpg",
      tag:"What’s vivid feels frequent or likely.",
-     explain:`Estimating risk/frequency by ease of recall, not base rates.`,
-     scenario:`After a viral “bot gone wrong” story, a counselor assumes all tools are dangerous, ignoring thousands of uneventful sessions.`},
+     explain:`Estimating risk by ease of recall, not base rates.`,
+     scenario:`After reading one viral article about an AI chatbot giving harmful advice, a counselor assumes all AI mental health tools are dangerous, ignoring thousands of successful clinical implementations.`},
+
+    {name:"Confirmation Bias",cat:"Reasoning",icon:"🔍",img:"confirmation-bias.jpg",
+     tag:"Seeking only what affirms what we already believe.",
+     explain:`Filtering for confirmatory evidence while neglecting disconfirming data.`,
+     scenario:`A therapist skeptical of AI only reads articles criticizing mental health technology while ignoring peer‑reviewed studies showing positive outcomes from AI‑assisted interventions.`},
 
     {name:"Cognitive Dissonance",cat:"Conflict",icon:"😵",img:"cognitive-dissonance.jpg",
      tag:"Tension between cherished beliefs and new facts.",
      explain:`Psychological discomfort from holding conflicting ideas/behaviors.`,
-     scenario:`He declares “AI has no place in therapy,” then appreciates how his CE site personalizes content—and quickly changes the subject.`},
+     scenario:`A counselor who claims “AI has no place in therapy” feels uncomfortable when their favorite professional development platform uses AI to personalize course recommendations and becomes defensive.`},
 
     {name:"Need for Closure",cat:"Motivation",icon:"🚪",img:"need-for-closure.jpg",
      tag:"Craving a definitive answer right now.",
-     explain:`Low tolerance for uncertainty or open-ended inquiry.`,
-     scenario:`“It’s good or bad—pick one,” she says, refusing a 2-week pilot that would yield data.`},
+     explain:`Low tolerance for uncertainty or open‑ended inquiry.`,
+     scenario:`When asked about AI in counseling, a therapist quickly declares “it’s either good or bad—I need to decide now” instead of exploring the nuanced implications over time.`},
 
     {name:"Intolerance of Uncertainty",cat:"Risk",icon:"⚖️",img:"intolerance-uncertainty.jpg",
      tag:"If it isn’t guaranteed, it can’t be tried.",
      explain:`Difficulty proceeding amid reasonable unknowns.`,
-     scenario:`A supervisor blocks a low-risk trial until outcomes can be guaranteed—thereby ensuring no outcomes are ever learned.`},
+     scenario:`A supervisor demands absolute certainty about AI’s future impact on therapy before considering any pilot program, unable to proceed with reasonable uncertainty.`},
 
     {name:"Red Herring",cat:"Fallacy",icon:"🐟",img:"red-herring.jpg",
      tag:"Changing the topic to dodge the decision.",
      explain:`Introducing an irrelevant issue to avoid the core question.`,
-     scenario:`While choosing a scheduler, someone pivots to, “But is AI truly conscious?” The meeting ends with no plan.`},
+     scenario:`During a discussion about using AI for scheduling efficiency, a therapist derails the conversation by debating whether AI has “true consciousness,” avoiding practical planning.`},
+
+    {name:"Attentional Bias",cat:"Attention",icon:"🎯",img:"attentional-bias.jpg",
+     tag:"Fixating on one feature; ignoring the rest.",
+     explain:`Over‑weighting a salient attribute while neglecting broader impacts.`,
+     scenario:`A counselor fixates on AI’s lack of empathy while ignoring how AI administrative tools could give them 10 more hours weekly for actual empathetic client contact.`},
+
+    {name:"Information Bias (Analysis Paralysis)",cat:"Decision",icon:"🧮",img:"information-bias.jpg",
+     tag:"Seeking info that won’t change the decision instead of testing.",
+     explain:`Overvaluing additional discussion/research when a small experiment would be more informative.`,
+     scenario:`A therapy group spends six months debating whether to try AI transcription without ever running a simple 2‑week pilot that would provide real data about its usefulness.`},
 
     {name:"Sunk Cost Fallacy",cat:"Decision",icon:"💸",img:"sunk-cost.jpg",
      tag:"Past effort traps present choices.",
      explain:`Continuing an inferior option due to prior investment.`,
-     scenario:`“I mastered this clunky EHR,” he says, rejecting a tool that would save hours weekly.`},
+     scenario:`A counselor continues using an outdated practice management system because “I invested so much time learning it” even though AI‑enhanced alternatives would save hours and reduce errors.`},
 
     {name:"False Dichotomy",cat:"Fallacy",icon:"⚡",img:"false-dichotomy.jpg",
      tag:"Only two extreme choices—or so it seems.",
      explain:`Forcing an either/or frame while ignoring middle paths.`,
-     scenario:`“Either go all-in on AI and lose our soul, or refuse it entirely,” a clinician insists, overlooking selective, ethical integration.`},
+     scenario:`A therapist insists “we either embrace AI completely and lose our humanity, or reject it entirely and stay authentic,” ignoring the middle ground of thoughtful, selective integration.`},
+
+    {name:"Anchoring",cat:"Judgment",icon:"⚓",img:"anchoring.jpg",
+     tag:"First beliefs set the reference point.",
+     explain:`Initial assumptions unduly shape later judgments.`,
+     scenario:`A seasoned therapist experiences profound disorientation realizing AI can draft clinical summaries as well as they can, struggling to update from a long‑held anchor about human exclusivity.`},
+
+    {name:"Cognitive Dissonance (Resolution)",cat:"Conflict",icon:"🔄",img:"dissonance-resolution.jpg",
+     tag:"Updating beliefs can feel awkward before it feels right.",
+     explain:`Adjusting beliefs/behaviors to reduce dissonance after new evidence.`,
+     scenario:`A counselor updates their belief that “technology always depersonalizes care” after using AI tools that actually increase client face‑time, causing temporary mental discomfort during the shift.`},
+
+    {name:"Motivated Reasoning",cat:"Reasoning",icon:"🧠",img:"motivated-reasoning.jpg",
+     tag:"Reasoning toward the conclusion we prefer.",
+     explain:`Evaluating evidence based on desired conclusions rather than accuracy.`,
+     scenario:`A therapist insists “humans are inherently better at therapy” as a psychological comfort, even when AI‑supported interventions show equal or better outcomes in certain contexts.`},
+
+    {name:"Argument from Incredulity",cat:"Fallacy",icon:"❓",img:"incredulity.jpg",
+     tag:"“I can’t imagine it, so it can’t be true.”",
+     explain:`Concluding something is false because it seems hard to believe.`,
+     scenario:`A counselor dismisses AI mood‑tracking apps because “only humans can understand emotions,” excluding the possibility that pattern recognition might complement human intuition.`},
 
     {name:"Loss Aversion",cat:"Decision",icon:"📉",img:"loss-aversion.jpg",
      tag:"Losses loom larger than equal gains.",
      explain:`Overweighting potential losses relative to similar gains.`,
-     scenario:`A new therapist fears, “My degree will be worthless,” instead of exploring complementary skills that would raise demand.`},
+     scenario:`A newly licensed therapist lies awake worrying “AI will make my degree worthless” instead of exploring how to develop AI‑complementary skills that increase their marketability.`},
+
+    {name:"Availability Cascade",cat:"Social",icon:"📢",img:"availability-cascade.jpg",
+     tag:"Repeated claims start to feel like facts.",
+     explain:`Perceived truth increases as ideas are amplified through repetition.`,
+     scenario:`A therapist repeatedly watches videos predicting “AI will destroy mental health care” to fuel their anger and anxiety, spending hours in outrage rather than constructive learning.`},
 
     {name:"Anthropomorphism",cat:"Attribution",icon:"🤖",img:"anthropomorphism.jpg",
      tag:"Giving tools human motives and feelings.",
      explain:`Ascribing intention or emotion to a nonhuman system.`,
-     scenario:`“The AI is trying to replace us,” someone says—as if the software were plotting.`},
+     scenario:`A counselor treats an AI chatbot as if it has feelings and intentions, telling colleagues “the AI is trying to replace us” as if the tool has motivations rather than functions.`},
 
     {name:"Automation Bias",cat:"Trust",icon:"✨",img:"automation-bias.jpg",
-     tag:"Over-trusting the system; under-checking yourself.",
-     explain:`Excessive reliance on automated outputs over judgment.`,
-     scenario:`He asks the model for clinical advice instead of a colleague, because “AI won’t judge my question,” and misses context he’d get in peer consult.`},
+     tag:"Over‑trusting the system; under‑checking yourself.",
+     explain:`Excessive reliance on automated outputs over professional judgment.`,
+     scenario:`A therapist prefers consulting AI for clinical advice over peer consultation because “AI never judges my questions,” avoiding the valuable but imperfect feedback from colleagues.`},
 
     {name:"Projection",cat:"Defense",icon:"🪞",img:"projection.jpg",
      tag:"My fear, your problem.",
      explain:`Attributing one’s own uncomfortable feelings to others.`,
-     scenario:`Feeling inadequate with tech, a counselor calls AI-using peers “cheaters” who feel threatened.`},
+     scenario:`A counselor who secretly fears inadequacy accuses others who use AI tools of “feeling threatened and trying to cheat,” projecting their own insecurities onto colleagues.`},
+
+    {name:"Illusory Pattern (Conspiracy Thinking)",cat:"Perception",icon:"🕵️",img:"illusory-pattern.jpg",
+     tag:"Seeing plots where none exist.",
+     explain:`Detecting intent/patterns in unrelated events.`,
+     scenario:`A therapist believes tech companies are “secretly programming AI to destroy the counseling profession” and sees evidence of this conspiracy in every AI mental health announcement.`},
 
     {name:"Magical Thinking",cat:"Distortion",icon:"✨",img:"magical-thinking.jpg",
      tag:"Wishful or mystical causality replaces evidence.",
      explain:`Believing thoughts or tools have supernatural power.`,
-     scenario:`A clinician claims an app can read minds, then plans treatment around the fantasy.`},
-
-    {name:"Illusory Pattern",cat:"Perception",icon:"🕵️",img:"illusory-pattern.jpg",
-     tag:"Seeing plots where none exist.",
-     explain:`Detecting intent/patterns in unrelated events.`,
-     scenario:`Each press release becomes “more proof” of a secret plan to end counseling; contradictory details are dismissed as “cover.”`},
+     scenario:`A counselor believes AI has mystical powers to read minds and predict the future, far beyond what the technology actually does, leading to either unrealistic fear or inflated expectations.`},
 
     {name:"Echo Chamber Effect",cat:"Social",icon:"🏝️",img:"echo-chamber.jpg",
      tag:"Only hearing people who already agree.",
      explain:`Information loops that amplify existing beliefs.`,
-     scenario:`Leaving supervision, a counselor joins a group that shares only alarmist AI takes; skepticism hardens into certainty.`}
+     scenario:`A therapist spends hours daily asking AI to validate increasingly detached theories about therapy, creating an isolated intellectual bubble disconnected from clinical reality and peer feedback.`},
+
+    {name:"Illusory Superiority",cat:"Self",icon:"🏆",img:"illusory-superiority.jpg",
+     tag:"Believing you’re uniquely exempt or chosen.",
+     explain:`Overestimating one’s special status or abilities relative to peers.`,
+     scenario:`A counselor believes AI has “chosen them” to receive special insights about the future of therapy, claiming a unique destiny that sets them apart from “ordinary” colleagues.`},
+
+    {name:"Overconfidence Effect",cat:"Judgment",icon:"📈",img:"overconfidence.jpg",
+     tag:"Confidence outpaces calibration.",
+     explain:`Subjective confidence exceeds objective accuracy or feedback.`,
+     scenario:`A therapist stops attending peer supervision, believing only AI understands their “revolutionary” views on mental health, cutting themselves off from professional community.`}
   ];
 
   // ---- State & helpers ----
