@@ -1,514 +1,356 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MindMeld Bias Buster</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/feather-icons"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-        
-        :root {
-            --primary: #667eea;
-            --primary-light: #a3bffa;
-            --primary-dark: #5a67d8;
-            --secondary: #9f7aea;
-            --secondary-light: #d6bcfa;
-            --secondary-dark: #805ad5;
-            --accent: #f687b3;
-            --background: #f7fafc;
-            --text: #2d3748;
-            --text-light: #4a5568;
-            --card-bg: rgba(255, 255, 255, 0.9);
-            --glass: rgba(255, 255, 255, 0.15);
-            --glass-border: rgba(255, 255, 255, 0.2);
-        }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>AI Cognitive Bias Matcher — v6.3 dense + tile badges</title>
+<style>
+  /* ===== BASE ===== */
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  :root{
+    --bg1:#6a63ff; --bg2:#8a6de9; --bg3:#b58cff;
+    --ink:#121420; --muted:#5d6278; --muted2:#7b81a1;
+    --brand:#667eea; --brand2:#764ba2;
+    --good:#2e7d32; --bad:#c62828;
+    --card:#ffffff; --ring:#dfe4ff;
+    --r-lg:16px; --r-md:12px; --r-sm:8px;
+    --pad-lg:14px; --pad-md:12px; --pad-sm:8px;
+    --shadow:0 8px 18px rgba(0,0,0,.14);
+  }
+  body{
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
+    background:
+      radial-gradient(1100px 700px at 12% 8%, #7aa2ff22, transparent 60%),
+      radial-gradient(900px 600px at 88% 18%, #e7b6ff22, transparent 60%),
+      linear-gradient(135deg,var(--bg1) 0%,var(--bg2) 55%,var(--bg3) 100%);
+    color:var(--ink); height:100vh; overflow:hidden; display:flex; align-items:center; justify-content:center; padding:6px;
+  }
+  .container{width:98vw;height:98vh;display:flex;flex-direction:column}
+  .card{background:var(--card);border-radius:var(--r-lg);box-shadow:var(--shadow);border:1px solid rgba(0,0,0,.05);padding:var(--pad-lg)}
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--background);
-            color: var(--text);
-            overflow-x: hidden;
-        }
+  /* ===== WELCOME ===== */
+  .welcome{height:100%;display:grid;place-items:center}
+  .welcome-inner{max-width:980px;width:min(100%,980px)}
+  .welcome h1{font-weight:900;letter-spacing:.3px;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.35);
+    text-align:center;margin-bottom:10px;font-size:clamp(1.6rem,3vw,2.4rem)}
+  .welcome .card{background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.08));border:1px solid rgba(255,255,255,.25)}
+  .welcome .card h2{color:#fff;font-size:1.05rem;margin-bottom:6px}
+  .welcome .card p{color:#f0f2ffcc;line-height:1.5;margin:8px auto;max-width:860px}
+  .actions{display:flex;gap:10px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+  .btn{background:linear-gradient(135deg,#6b73ff 0%, #000dff 100%);color:#fff;border:0;border-radius:999px;
+      padding:10px 16px;font-size:.96rem;font-weight:700;cursor:pointer;box-shadow:0 10px 20px rgba(0,13,255,.28);
+      transition:.15s ease}
+  .btn:hover{transform:translateY(-2px)}
+  .btn.secondary{background:#fff;color:#2a33e8;border:2px solid #3e48ff;box-shadow:none}
 
-        .gradient-text {
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            background-image: linear-gradient(90deg, var(--primary), var(--secondary));
-        }
+  /* ===== GAME ===== */
+  .game{display:none;height:100%;grid-template-rows:auto 8px 1fr;gap:6px}
+  .header{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .title{color:#fff;font-weight:900;letter-spacing:.4px;text-shadow:0 2px 10px rgba(0,0,0,.35); font-size:clamp(1.1rem,2vw,1.5rem)}
+  .hud{display:flex;align-items:center;gap:10px;padding:6px 10px;background:#ffffffef;border:1px solid #e7eaff;border-radius:12px}
+  .stat{font-weight:800;color:#1a1f2e}.stat small{color:#6a73a8;font-weight:600}
+  .progress{padding:0;overflow:hidden;border-radius:10px;background:#ffffff90;border:1px solid #e6e6ff}
+  .bar{height:8px;width:0;background:linear-gradient(90deg,#4caf50 0%,#8bc34a 100%); color:#1d1d1d;font-size:.7rem;line-height:8px;text-align:center;transition:width .45s ease}
+  .main{display:grid;grid-template-columns:1.15fr 1fr;gap:6px;height:calc(100% - 0px)}
 
-        .floating {
-            animation: floating 6s ease-in-out infinite;
-        }
+  /* ===== LEFT: SCENARIO ===== */
+  .scenario{position:relative;display:flex;flex-direction:column;gap:10px;overflow:hidden;border:1px solid var(--ring)}
+  .scenario-header{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(180deg,#f6f7ff,#eef1ff); padding:8px 12px;border-radius:10px;border:1px solid var(--ring)}
+  .label{color:#5b62ea;font-size:.78rem;font-weight:900;letter-spacing:1.4px;text-transform:uppercase}
+  .label-emoji{font-size:1.2rem;opacity:.9}
+  .scenario-body{
+    display:grid;place-items:center;flex:1;min-height:0;
+    background:radial-gradient(700px 420px at 110% -10%, #f4f6ff 0%, transparent 60%),
+               radial-gradient(500px 320px at -10% 110%, #f7f8ff 0%, transparent 60%),
+               linear-gradient(180deg,#ffffff 0%,#fbfbff 100%);
+    border-radius:12px;border:1px dashed #a9b2ff; padding:14px;
+  }
+  .scenario-text{font-size:clamp(1.02rem,1.4vw,1.16rem);line-height:1.6;color:#161927;max-width:900px;margin:auto}
+  .dragTip{margin-top:8px;font-size:.84rem;color:#6a6f90}
 
-        @keyframes floating {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-15px); }
-            100% { transform: translateY(0px); }
-        }
+  /* ===== RIGHT: CHOICES ===== */
+  .choices{display:grid;grid-template-rows:auto 1fr;overflow:hidden;padding:10px}
+  .choices h3{color:#2b2f55;font-weight:900;margin:2px 2px 8px}
+  .targets{display:grid;gap:8px;align-content:start;overflow:auto;padding-right:2px; grid-template-columns:repeat(2,minmax(240px,1fr))}
+  .tile{display:flex;gap:10px;align-items:flex-start;border-radius:12px;border:2px solid transparent;
+        background:linear-gradient(135deg,#f5f7fa 0%,#d7def0 100%);padding:10px 12px;min-height:68px;transition:.12s ease}
+  .tile:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.16);border-color:#7f8cff;background:linear-gradient(135deg,#eaf3ff 0%,#cddcff 100%)}
+  .letter{background:#5f6bff;color:#fff;width:28px;height:28px;display:grid;place-items:center;border-radius:999px;font-weight:900;flex-shrink:0;margin-top:2px}
+  /* Decorative badge (non-informational) */
+  .badge{width:22px;height:22px;border-radius:999px;background:#fff;display:grid;place-items:center;border:1px solid #cdd3ff; box-shadow:inset 0 0 6px rgba(0,0,0,.04); font-size:14px;line-height:1;flex-shrink:0;margin-top:3px}
+  .tname{font-weight:900;color:#121426;font-size:.98rem}
+  .tcat{font-size:.78rem;color:#4b5183;font-style:italic;margin-top:1px}
+  .tdesc{font-size:.82rem;color:#2d3355;margin-top:3px}
+  .tile.correct{background:linear-gradient(135deg,#84fab0 0%,#8fd3f4 100%);border-color:var(--good)}
+  .tile.incorrect{background:linear-gradient(135deg,#ff9a9e 0%,#fecfef 100%);border-color:var(--bad)}
 
-        .pulse {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
+  /* ===== OVERLAY & DONE ===== */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:999}
+  .overlay.show{display:flex}
+  .fbox{background:#fff;padding:26px 34px;border-radius:14px;text-align:center;box-shadow:0 16px 36px rgba(0,0,0,.35);max-width:760px;position:relative}
+  .fbox h2{font-size:1.9rem;margin-bottom:6px}
+  .fbox.correct h2{color:var(--good)} .fbox.incorrect h2{color:var(--bad)}
+  .fbox p{color:#333;font-size:1rem}
+  .explain{margin-top:8px;color:#2b2b2b;font-size:.98rem}
+  .closex{position:absolute;top:10px;right:10px;border:none;background:#eef;color:#4b57d6;width:34px;height:34px;border-radius:50%;font-weight:800;cursor:pointer}
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
+  .done{display:none;height:100%;place-items:center;text-align:center}
+  .done h1{color:#4caf50;font-size:clamp(1.6rem,3vw,2.4rem);margin-bottom:8px}
+  .stats{display:flex;gap:12px;justify-content:center;margin:10px 0 6px;flex-wrap:wrap}
+  .statbox{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;padding:16px 22px;border-radius:12px;min-width:150px}
+  .statbox .lab{opacity:.92;font-size:.93rem}.statbox .val{font-weight:900;font-size:1.8rem}
 
-        .glass-effect {
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-        }
-
-        .tile-hover-effect {
-            transition: all 0.3s ease;
-            transform-style: preserve-3d;
-        }
-
-        .tile-hover-effect:hover {
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-
-        .drag-highlight {
-            animation: dragHighlight 1.5s ease infinite;
-        }
-
-        @keyframes dragHighlight {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0); }
-            50% { box-shadow: 0 0 0 10px rgba(102, 126, 234, 0.2); }
-        }
-    </style>
+  /* ===== RESPONSIVE ===== */
+  @media (max-width:1100px){.main{grid-template-columns:1fr;grid-template-rows:1fr 1fr}.targets{grid-template-columns:1fr}}
+  @media (max-width:540px){.btn{width:100%}.scenario-text{max-width:96%}}
+</style>
 </head>
-<body class="min-h-screen antialiased">
-    <div id="vanta-bg" class="fixed inset-0 -z-10"></div>
-    <div class="container mx-auto px-4 py-8 max-w-6xl">
-        <!-- Welcome Screen -->
-        <section id="welcome" class="flex flex-col items-center justify-center min-h-screen py-12">
-            <div class="text-center max-w-3xl mx-auto glass-effect rounded-2xl p-8 shadow-2xl">
-                <div class="w-24 h-24 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6 floating">
-                    <i data-feather="brain" class="text-white w-12 h-12"></i>
-                </div>
-                <h1 class="text-4xl md:text-5xl font-extrabold mb-6 gradient-text">MindMeld Bias Buster</h1>
-                <p class="text-xl text-gray-700 mb-8">Match cognitive biases to real-world scenarios in this interactive learning experience</p>
-                
-                <div class="glass-effect rounded-xl p-6 mb-8">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-4">How to Play</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
-                        <div class="bg-white bg-opacity-50 p-4 rounded-lg">
-                            <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center mb-2">
-                                <i data-feather="book" class="text-indigo-600"></i>
-                            </div>
-                            <h3 class="font-bold text-gray-800 mb-1">Read Scenario</h3>
-                            <p class="text-gray-600 text-sm">Analyze each counseling situation carefully</p>
-                        </div>
-                        <div class="bg-white bg-opacity-50 p-4 rounded-lg">
-                            <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mb-2">
-                                <i data-feather="compass" class="text-purple-600"></i>
-                            </div>
-                            <h3 class="font-bold text-gray-800 mb-1">Identify Bias</h3>
-                            <p class="text-gray-600 text-sm">Match to the correct cognitive bias or fallacy</p>
-                        </div>
-                        <div class="bg-white bg-opacity-50 p-4 rounded-lg">
-                            <div class="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center mb-2">
-                                <i data-feather="award" class="text-pink-600"></i>
-                            </div>
-                            <h3 class="font-bold text-gray-800 mb-1">Learn & Improve</h3>
-                            <p class="text-gray-600 text-sm">Detailed explanations help you master the concepts</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex flex-col sm:flex-row justify-center gap-4">
-                    <button id="startQuick" class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2">
-                        <i data-feather="zap"></i> Quick Play (10)
-                    </button>
-                    <button id="startFull" class="bg-white hover:bg-gray-100 text-indigo-700 font-bold py-3 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 border-2 border-indigo-500">
-                        <i data-feather="book-open"></i> Full Deck (36)
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Game Screen -->
-        <section id="game" class="hidden min-h-screen py-8 flex flex-col">
-            <div class="flex justify-between items-center mb-6 glass-effect rounded-xl p-4">
-                <div>
-                    <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
-                        <i data-feather="target" class="text-indigo-600"></i> 
-                        <span>Match the Cognitive Bias</span>
-                    </h2>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div class="bg-white bg-opacity-80 rounded-lg px-4 py-2 shadow">
-                        <span class="font-medium text-gray-700">Score:</span>
-                        <span id="score" class="font-bold text-indigo-600 ml-1">0</span>
-                        <span class="text-gray-500">/</span>
-                        <span id="total" class="font-bold text-indigo-600">0</span>
-                    </div>
-                    <div class="bg-white bg-opacity-80 rounded-lg px-4 py-2 shadow">
-                        <span class="font-medium text-gray-700">Accuracy:</span>
-                        <span id="acc" class="font-bold text-purple-600 ml-1">0%</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="w-full bg-white bg-opacity-80 rounded-lg h-3 mb-6 shadow-inner overflow-hidden">
-                <div id="bar" class="h-full bg-gradient-to-r from-indigo-500 to-purple-600 transition-all duration-500 ease-out text-xs text-white flex items-center justify-center" style="width: 0%">Question 0</div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-grow">
-                <!-- Scenario Card -->
-                <div class="bg-white bg-opacity-90 rounded-2xl p-6 shadow-xl flex flex-col">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-bold text-lg text-gray-800 flex items-center gap-2">
-                            <i data-feather="file-text" class="text-indigo-600"></i>
-                            <span>Cognitive Scenario</span>
-                        </h3>
-                        <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center" id="scenarioEmoji">
-                            🧩
-                        </div>
-                    </div>
-                    <div id="dragSrc" class="flex-grow flex flex-col justify-center items-center bg-indigo-50 rounded-xl p-6 border-2 border-dashed border-indigo-200 drag-highlight">
-                        <div id="scenario" class="text-gray-800 text-lg leading-relaxed mb-4 text-center"></div>
-                        <div class="text-sm text-indigo-600 flex items-center gap-1">
-                            <i data-feather="move" class="w-4 h-4"></i>
-                            <span>Drag onto a fallacy tile or press <span class="font-bold">1-5</span></span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Choices Card -->
-                <div class="bg-white bg-opacity-90 rounded-2xl p-6 shadow-xl flex flex-col">
-                    <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
-                        <i data-feather="check-circle" class="text-purple-600"></i>
-                        <span>Select the Correct Fallacy</span>
-                    </h3>
-                    <div id="targets" class="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto custom-scroll"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Results Screen -->
-        <section id="done" class="hidden min-h-screen py-12 flex items-center justify-center">
-            <div class="bg-white bg-opacity-90 rounded-2xl p-8 shadow-2xl max-w-2xl w-full text-center">
-                <div class="w-20 h-20 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6 animate-bounce">
-                    <i data-feather="award" class="text-white w-10 h-10"></i>
-                </div>
-                <h1 class="text-3xl font-extrabold text-gray-900 mb-2">Game Complete! 🎉</h1>
-                <p class="text-gray-600 text-lg mb-8">You've sharpened your cognitive toolkit today!</p>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    <div class="bg-gradient-to-br from-indigo-100 to-purple-100 rounded-xl p-6">
-                        <div class="text-4xl font-bold text-indigo-600" id="finalScore">0</div>
-                        <div class="text-gray-700 font-medium">Final Score</div>
-                    </div>
-                    <div class="bg-gradient-to-br from-purple-100 to-pink-100 rounded-xl p-6">
-                        <div class="text-4xl font-bold text-purple-600" id="finalAcc">0%</div>
-                        <div class="text-gray-700 font-medium">Accuracy</div>
-                    </div>
-                </div>
-                
-                <div class="flex justify-center">
-                    <button id="playAgain" class="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2">
-                        <i data-feather="refresh-cw"></i> Play Again
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Feedback Overlay -->
-        <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
-            <div id="fbox" class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full relative">
-                <button id="closex" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600">
-                    <i data-feather="x"></i>
-                </button>
-                <div id="ficon" class="w-16 h-16 rounded-full flex items-center justify-center text-3xl mx-auto mb-4"></div>
-                <h2 id="fmsg" class="text-2xl font-bold text-center mb-4"></h2>
-                <p id="explain" class="text-gray-700 text-center"></p>
-            </div>
+<body>
+  <div class="container">
+    <!-- WELCOME -->
+    <section class="welcome" id="welcome">
+      <div class="welcome-inner">
+        <h1>🧠 Match the Cognitive Bias</h1>
+        <div class="card">
+          <h2>Welcome, Counselors</h2>
+          <p>Match each real-world scenario with the bias or fallacy at play. Visuals are engaging but never reveal answers.</p>
+          <p>Drag the scenario onto a tile (or press <strong>1–5</strong>). Quick Play = 10 rounds. Full Deck = all 36.</p>
+          <div class="actions">
+            <button class="btn" id="startQuick">🚀 Quick Play (10)</button>
+            <button class="btn secondary" id="startFull">🧩 Full Deck (36)</button>
+          </div>
         </div>
+      </div>
+    </section>
+
+    <!-- GAME -->
+    <section class="game" id="game">
+      <div class="header">
+        <div class="title">🎯 Match the Cognitive Bias</div>
+        <div class="hud card">
+          <div class="stat">Score:&nbsp;<span id="score">0</span><small>&nbsp;/&nbsp;</small><span id="total">0</span></div>
+          <div class="stat">Accuracy:&nbsp;<span id="acc">0%</span></div>
+        </div>
+      </div>
+
+      <div class="progress card"><div class="bar" id="bar">Question 0</div></div>
+
+      <div class="main">
+        <!-- LEFT -->
+        <div class="scenario card">
+          <div class="scenario-header">
+            <div class="label">Counseling Scenario</div>
+            <div class="label-emoji" id="scenarioEmoji" aria-hidden="true">🧩</div>
+          </div>
+          <div class="scenario-body" id="dragSrc" draggable="true" aria-grabbed="false"
+               aria-label="Scenario card. Drag onto the correct fallacy tile.">
+            <div class="scenario-text" id="scenario"></div>
+            <div class="dragTip">Drag onto a fallacy tile → &nbsp; (or press <strong>1–5</strong>)</div>
+          </div>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="choices card">
+          <h3>Drop onto the correct fallacy</h3>
+          <div class="targets" id="targets"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DONE -->
+    <section class="done" id="done">
+      <div class="card" style="max-width:900px">
+        <h1>🎉 Game Complete!</h1>
+        <p style="color:#444">Thoughtful integration beats fear — augment, don’t replace, human care.</p>
+        <div class="stats">
+          <div class="statbox"><div class="lab">Final Score</div><div class="val" id="finalScore">0</div></div>
+          <div class="statbox"><div class="lab">Accuracy</div><div class="val" id="finalAcc">0%</div></div>
+        </div>
+        <div class="actions" style="margin-top:8px"><button class="btn" id="playAgain">🔄 Play Again</button></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- OVERLAY -->
+  <div class="overlay" id="overlay" aria-modal="true" role="dialog">
+    <div class="fbox" id="fbox">
+      <button class="closex" id="closex" aria-label="Close">×</button>
+      <h2 id="ficon">✓</h2>
+      <p id="fmsg"></p>
+      <div class="explain" id="explain"></div>
     </div>
+  </div>
 
-    <script>
-        // Vanta.js Background
-        if (VANTA) {
-            VANTA.NET({
-                el: "#vanta-bg",
-                mouseControls: true,
-                touchControls: true,
-                gyroControls: false,
-                minHeight: 200.00,
-                minWidth: 200.00,
-                scale: 1.00,
-                scaleMobile: 1.00,
-                color: 0x667eea,
-                backgroundColor: 0xf7fafc,
-                points: 12.00,
-                maxDistance: 22.00,
-                spacing: 16.00
-            })
-        }
+<script>
+  // ===== DATA (same items, trimmed icons) =====
+  const DATA = [
+    {name:"Status Quo Bias",cat:"Resistance",tag:"Preferring the familiar—even when a better path is clear.",explain:`Tendency to keep current routines because change feels costly or risky.`,scenario:`A therapist insists on using only paper intake forms because “my current system works fine,” despite clients requesting digital options and missing appointments due to paperwork delays.`},
+    {name:"Belief Perseverance",cat:"Reasoning",tag:"Clinging to a belief despite clear contrary evidence.",explain:`Existing beliefs are maintained even after receiving disconfirming evidence.`,scenario:`A clinical supervisor dismisses AI-assisted note-taking as “just a fad,” even after three colleagues report saving 5+ hours weekly and having more energy for client care.`},
+    {name:"Normalcy Bias",cat:"Resistance",tag:"Assuming tomorrow will look like yesterday.",explain:`Underestimating the speed/impact of change; planning for continuity.`,scenario:`A counseling practice owner plans a 5-year expansion assuming AI capabilities will stay the same, ignoring monthly breakthroughs in mental health tech reported in professional journals.`},
+    {name:"Attitude Polarization",cat:"Reasoning",tag:"Pre-judging; exposure to mixed info hardens the initial stance.",explain:`Evaluating new information in a way that strengthens preexisting views.`,scenario:`Before attending a workshop on AI tools for therapists, a counselor declares “machines can never understand emotions” and decides the training will be useless.`},
+    {name:"Rationalization",cat:"Defense",tag:"Plausible-sounding excuses that mask avoidance.",explain:`Constructing reasons that soothe discomfort rather than reflect reality.`,scenario:`A psychologist creates elaborate arguments about “the sacred therapeutic relationship” to avoid learning AI documentation tools, despite spending 2 hours nightly on paperwork instead of self-care.`},
+    {name:"Appeal to Tradition",cat:"Fallacy",tag:"“We’ve always done it this way,” therefore it’s best.",explain:`Arguing from custom rather than evidence, outcomes, or values.`,scenario:`A counselor argues against telehealth platforms with AI scheduling because “therapists have always met clients face-to-face for 100 years, and we shouldn’t change that now.”`},
+    {name:"In-group Bias",cat:"Fairness",tag:"Serving those like us, overlooking those unlike us.",explain:`Favoring one’s own group—even when others could benefit.`,scenario:`A therapy clinic serves only affluent clients who can afford in-person sessions, refusing to adopt AI-enhanced teletherapy that could reach underserved rural communities.`},
+    {name:"Catastrophizing",cat:"Distortion",tag:"Jumping straight from change to doom.",explain:`Overestimating worst-case outcomes while neglecting realistic positives.`,scenario:`A counselor hears about AI therapy chatbots and immediately concludes “this is the end of our profession—we’ll all be replaced within months,” refusing to explore how AI might assist rather than replace.`},
+    {name:"Ambiguity Aversion",cat:"Risk",tag:"Unknowns feel riskier than known flaws.",explain:`Preference for familiar risks over uncertain alternatives.`,scenario:`A therapist who has never tried AI tools expresses intense anxiety about “robots taking over therapy” but becomes curious and calm after a 20-minute demo of AI transcription.`},
+    {name:"Identity-Protective Cognition",cat:"Social",tag:"Protecting status/role by rejecting new information.",explain:`Discarding evidence that seems to diminish one’s professional identity.`,scenario:`When AI diagnostic support tools are introduced, a senior therapist argues passionately that “using technology shows we’re not real clinicians” to protect their sense of expertise.`},
+    {name:"Negativity Bias",cat:"Attention",tag:"Bad news sticks; good news slides off.",explain:`Attending to and recalling negative information more strongly.`,scenario:`A counselor becomes obsessed with articles predicting “AI will eliminate all therapy jobs by 2030,” checking daily for apocalyptic news rather than learning adaptive skills.`},
+    {name:"Ostrich Effect (Information Avoidance)",cat:"Attention",tag:"Avoiding info that could cause psychological discomfort.",explain:`Deliberately avoiding knowledge that could require change.`,scenario:`A therapist avoids even reading about AI mental health tools because the unfamiliarity makes them anxious, preferring to stay in their comfort zone regardless of client needs.`},
+    {name:"Availability Heuristic",cat:"Judgment",tag:"What’s vivid feels frequent or likely.",explain:`Estimating risk by ease of recall, not base rates.`,scenario:`After reading one viral article about an AI chatbot giving harmful advice, a counselor assumes all AI mental health tools are dangerous, ignoring thousands of successful clinical implementations.`},
+    {name:"Confirmation Bias",cat:"Reasoning",tag:"Seeking only what affirms what we already believe.",explain:`Filtering for confirmatory evidence while neglecting disconfirming data.`,scenario:`A therapist skeptical of AI only reads articles criticizing mental health technology while ignoring peer-reviewed studies showing positive outcomes from AI-assisted interventions.`},
+    {name:"Cognitive Dissonance",cat:"Conflict",tag:"Tension between cherished beliefs and new facts.",explain:`Psychological discomfort from holding conflicting ideas/behaviors.`,scenario:`A counselor who claims “AI has no place in therapy” feels uncomfortable when their favorite professional development platform uses AI to personalize course recommendations and becomes defensive.`},
+    {name:"Need for Closure",cat:"Motivation",tag:"Craving a definitive answer right now.",explain:`Low tolerance for uncertainty or open-ended inquiry.`,scenario:`When asked about AI in counseling, a therapist quickly declares “it’s either good or bad—I need to decide now” instead of exploring the nuanced implications over time.`},
+    {name:"Intolerance of Uncertainty",cat:"Risk",tag:"If it isn’t guaranteed, it can’t be tried.",explain:`Difficulty proceeding amid reasonable unknowns.`,scenario:`A supervisor demands absolute certainty about AI’s future impact before considering any pilot program, unable to proceed with reasonable uncertainty.`},
+    {name:"Red Herring",cat:"Fallacy",tag:"Changing the topic to dodge the decision.",explain:`Introducing an irrelevant issue to avoid the core question.`,scenario:`During a discussion about using AI for scheduling efficiency, a therapist derails the conversation by debating whether AI has “true consciousness,” avoiding practical planning.`},
+    {name:"Attentional Bias",cat:"Attention",tag:"Fixating on one feature; ignoring the rest.",explain:`Over-weighting a salient attribute while neglecting broader impacts.`,scenario:`A counselor fixates on AI’s lack of empathy while ignoring how AI administrative tools could give them 10 more hours weekly for actual empathetic client contact.`},
+    {name:"Information Bias (Analysis Paralysis)",cat:"Decision",tag:"Seeking info that won’t change the decision instead of testing.",explain:`Overvaluing discussion when a small experiment would be more informative.`,scenario:`A therapy group spends six months debating whether to try AI transcription without ever running a simple 2-week pilot that would provide real data about its usefulness.`},
+    {name:"Sunk Cost Fallacy",cat:"Decision",tag:"Past effort traps present choices.",explain:`Continuing an inferior option due to prior investment.`,scenario:`A counselor continues using an outdated practice management system because “I invested so much time learning it” even though AI-enhanced alternatives would save hours and reduce errors.`},
+    {name:"False Dichotomy",cat:"Fallacy",tag:"Only two extreme choices—or so it seems.",explain:`Forcing an either/or frame while ignoring middle paths.`,scenario:`A therapist insists “we either embrace AI completely and lose our humanity, or reject it entirely and stay authentic,” ignoring the middle ground of selective integration.`},
+    {name:"Anchoring",cat:"Judgment",tag:"First beliefs set the reference point.",explain:`Initial assumptions unduly shape later judgments.`,scenario:`A seasoned therapist experiences disorientation realizing AI can draft clinical summaries well, struggling to update from a long-held anchor about human exclusivity.`},
+    {name:"Cognitive Dissonance (Resolution)",cat:"Conflict",tag:"Updating beliefs can feel awkward before it feels right.",explain:`Adjusting beliefs/behaviors to reduce dissonance after new evidence.`,scenario:`A counselor updates their belief that “technology always depersonalizes care” after using AI tools that increase client face-time, feeling temporary discomfort during the shift.`},
+    {name:"Motivated Reasoning",cat:"Reasoning",tag:"Reasoning toward the conclusion we prefer.",explain:`Evaluating evidence based on desired conclusions rather than accuracy.`,scenario:`A therapist insists “humans are inherently better at therapy” as a psychological comfort, even when AI-supported interventions show equal or better outcomes in some contexts.`},
+    {name:"Argument from Incredulity",cat:"Fallacy",tag:"“I can’t imagine it, so it can’t be true.”",explain:`Concluding something is false because it seems hard to believe.`,scenario:`A counselor dismisses AI mood-tracking apps because “only humans can understand emotions,” excluding the possibility that pattern recognition might complement human intuition.`},
+    {name:"Loss Aversion",cat:"Decision",tag:"Losses loom larger than equal gains.",explain:`Overweighting potential losses relative to similar gains.`,scenario:`A newly licensed therapist worries “AI will make my degree worthless” instead of exploring AI-complementary skills that increase marketability.`},
+    {name:"Availability Cascade",cat:"Social",tag:"Repeated claims start to feel like facts.",explain:`Perceived truth increases as ideas are amplified through repetition.`,scenario:`A therapist binge-watches videos predicting “AI will destroy mental health care,” spending hours in outrage rather than constructive learning.`},
+    {name:"Anthropomorphism",cat:"Attribution",tag:"Giving tools human motives and feelings.",explain:`Ascribing intention or emotion to a nonhuman system.`,scenario:`A counselor treats an AI chatbot as if it has feelings and intentions, telling colleagues “the AI is trying to replace us” as if the tool has motivations rather than functions.`},
+    {name:"Automation Bias",cat:"Trust",tag:"Over-trusting the system; under-checking yourself.",explain:`Excessive reliance on automated outputs over professional judgment.`,scenario:`A therapist prefers consulting AI for clinical advice over peer supervision because “AI never judges my questions,” avoiding imperfect but valuable peer feedback.`},
+    {name:"Projection",cat:"Defense",tag:"My fear, your problem.",explain:`Attributing one’s own uncomfortable feelings to others.`,scenario:`A counselor who secretly fears inadequacy accuses colleagues using AI tools of “cheating,” projecting their own insecurities.`},
+    {name:"Illusory Pattern (Conspiracy Thinking)",cat:"Perception",tag:"Seeing plots where none exist.",explain:`Detecting intent/patterns in unrelated events.`,scenario:`A therapist believes tech companies are “secretly programming AI to destroy counseling” and sees evidence of this in every announcement.`},
+    {name:"Magical Thinking",cat:"Distortion",tag:"Wishful or mystical causality replaces evidence.",explain:`Believing thoughts or tools have supernatural power.`,scenario:`A counselor believes AI has mystical powers to read minds and predict the future, far beyond what the technology actually does.`},
+    {name:"Echo Chamber Effect",cat:"Social",tag:"Only hearing people who already agree.",explain:`Information loops that amplify existing beliefs.`,scenario:`A therapist spends hours asking AI to validate increasingly detached theories, creating an isolated bubble disconnected from clinical reality.`},
+    {name:"Illusory Superiority",cat:"Self",tag:"Believing you’re uniquely exempt or chosen.",explain:`Overestimating one’s special status or abilities.`,scenario:`A counselor believes AI has “chosen them” for unique insights, setting them apart from “ordinary” colleagues.`},
+    {name:"Overconfidence Effect",cat:"Judgment",tag:"Confidence outpaces calibration.",explain:`Subjective confidence exceeds objective accuracy or feedback.`,scenario:`A therapist stops attending supervision, believing only AI understands their “revolutionary” views, cutting off community feedback.`}
+  ];
 
-        // Game Data
-        const DATA = [
-            {name:"Status Quo Bias",cat:"Resistance",tag:"Preferring the familiar—even when a better path is clear.",explain:`Tendency to keep current routines because change feels costly or risky.`,scenario:`A therapist insists on using only paper intake forms because "my current system works fine," despite clients requesting digital options and missing appointments due to paperwork delays.`},
-            {name:"Belief Perseverance",cat:"Reasoning",tag:"Clinging to a belief despite clear contrary evidence.",explain:`Existing beliefs are maintained even after receiving disconfirming evidence.`,scenario:`A clinical supervisor dismisses AI-assisted note-taking as "just a fad," even after three colleagues report saving 5+ hours weekly and having more energy for client care.`},
-            {name:"Normalcy Bias",cat:"Resistance",tag:"Assuming tomorrow will look like yesterday.",explain:`Underestimating the speed/impact of change; planning for continuity.`,scenario:`A counseling practice owner plans a 5-year expansion assuming AI capabilities will stay the same, ignoring monthly breakthroughs in mental health tech reported in professional journals.`},
-            {name:"Attitude Polarization",cat:"Reasoning",tag:"Pre-judging; exposure to mixed info hardens the initial stance.",explain:`Evaluating new information in a way that strengthens preexisting views.`,scenario:`Before attending a workshop on AI tools for therapists, a counselor declares "machines can never understand emotions" and decides the training will be useless.`},
-            {name:"Rationalization",cat:"Defense",tag:"Plausible-sounding excuses that mask avoidance.",explain:`Constructing reasons that soothe discomfort rather than reflect reality.`,scenario:`A psychologist creates elaborate arguments about "the sacred therapeutic relationship" to avoid learning AI documentation tools, despite spending 2 hours nightly on paperwork instead of self-care.`},
-            {name:"Appeal to Tradition",cat:"Fallacy",tag:""We've always done it this way," therefore it's best.",explain:`Arguing from custom rather than evidence, outcomes, or values.`,scenario:`A counselor argues against telehealth platforms with AI scheduling because "therapists have always met clients face-to-face for 100 years, and we shouldn't change that now."`},
-            {name:"In-group Bias",cat:"Fairness",tag:"Serving those like us, overlooking those unlike us.",explain:`Favoring one's own group—even when others could benefit.`,scenario:`A therapy clinic serves only affluent clients who can afford in-person sessions, refusing to adopt AI-enhanced teletherapy that could reach underserved rural communities.`},
-            {name:"Catastrophizing",cat:"Distortion",tag:"Jumping straight from change to doom.",explain:`Overestimating worst-case outcomes while neglecting realistic positives.`,scenario:`A counselor hears about AI therapy chatbots and immediately concludes "this is the end of our profession—we'll all be replaced within months," refusing to explore how AI might assist rather than replace.`},
-            {name:"Ambiguity Aversion",cat:"Risk",tag:"Unknowns feel riskier than known flaws.",explain:`Preference for familiar risks over uncertain alternatives.`,scenario:`A therapist who has never tried AI tools expresses intense anxiety about "robots taking over therapy" but becomes curious and calm after a 20-minute demo of AI transcription.`},
-            {name:"Identity-Protective Cognition",cat:"Social",tag:"Protecting status/role by rejecting new information.",explain:`Discarding evidence that seems to diminish one's professional identity.`,scenario:`When AI diagnostic support tools are introduced, a senior therapist argues passionately that "using technology shows we're not real clinicians" to protect their sense of expertise.`}
-        ];
+  const $=s=>document.querySelector(s);
+  const shuffle=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);
+  const state={deck:[],qIndex:0,score:0,attempts:0,total:0,current:null};
 
-        const neutralEmojis = ["🧭","🧩","🎯","🧠","🔍","⚖️","🌐","📎","💡","📊","🛰️","🪄"];
-        const state = {deck: [], qIndex: 0, score: 0, attempts: 0, total: 0, current: null};
-        
-        // DOM Elements
-        const $ = (selector) => document.querySelector(selector);
-        const shuffle = (array) => array.sort(() => Math.random() - 0.5);
-        
-        // Initialize game
-        function initGame() {
-            feather.replace();
-            setupEventListeners();
-        }
-        
-        function setupEventListeners() {
-            $('#startQuick').addEventListener('click', () => startGame(10));
-            $('#startFull').addEventListener('click', () => startGame(DATA.length));
-            $('#playAgain').addEventListener('click', () => location.reload());
-            $('#closex').addEventListener('click', () => $('#overlay').classList.add('hidden'));
-        }
-        
-        function startGame(rounds) {
-            $('#welcome').classList.add('hidden');
-            $('#done').classList.add('hidden');
-            $('#game').classList.remove('hidden');
-            
-            state.deck = shuffle([...DATA]).slice(0, Math.min(rounds, DATA.length));
-            state.qIndex = 0;
-            state.score = 0;
-            state.attempts = 0;
-            state.total = state.deck.length;
-            
-            $('#total').textContent = state.total;
-            $('#score').textContent = 0;
-            $('#acc').textContent = '0%';
-            
-            renderQuestion();
-        }
-        
-        function renderQuestion() {
-            const item = state.deck[state.qIndex];
-            state.current = item;
-            
-            // Set random emoji
-            $('#scenarioEmoji').textContent = neutralEmojis[Math.floor(Math.random() * neutralEmojis.length)];
-            
-            // Update scenario text
-            $('#scenario').textContent = item.scenario;
-            
-            // Update progress bar
-            updateProgress();
-            
-            // Generate answer options (1 correct + 4 random)
-            const pool = DATA.filter(x => x.name !== item.name);
-            const distractors = shuffle([...pool]).slice(0, 4);
-            const options = shuffle([item, ...distractors]);
-            
-            // Render answer tiles
-            $('#targets').innerHTML = options.map((option, index) => `
-                <div class="tile-hover-effect bg-white rounded-lg p-4 shadow-md cursor-pointer transition-all duration-300" 
-                     data-name="${option.name}" 
-                     tabindex="0" 
-                     role="button">
-                    <div class="flex items-start gap-3">
-                        <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">${index + 1}</div>
-                        <div>
-                            <h3 class="font-bold text-gray-800">${option.name}</h3>
-                            <p class="text-xs text-indigo-500 italic">${option.cat}</p>
-                            <p class="text-sm text-gray-600 mt-1">${option.tag || ''}</p>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-            
-            // Setup drag and drop for scenario card
-            const dragSrc = $('#dragSrc');
-            dragSrc.setAttribute('draggable', 'true');
-            dragSrc.addEventListener('dragstart', (e) => {
-                e.dataTransfer.setData('text/plain', 'scenario');
-                dragSrc.classList.add('opacity-50');
-            });
-            
-            dragSrc.addEventListener('dragend', () => {
-                dragSrc.classList.remove('opacity-50');
-            });
-            
-            // Setup tile interactions
-            document.querySelectorAll('#targets .tile-hover-effect').forEach(tile => {
-                // Drag and drop
-                tile.addEventListener('dragover', (e) => {
-                    e.preventDefault();
-                    tile.classList.add('ring-2', 'ring-indigo-400');
-                });
-                
-                tile.addEventListener('dragleave', () => {
-                    tile.classList.remove('ring-2', 'ring-indigo-400');
-                });
-                
-                tile.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    tile.classList.remove('ring-2', 'ring-indigo-400');
-                    handleChoice(tile.getAttribute('data-name'));
-                });
-                
-                // Click and keyboard
-                tile.addEventListener('click', () => handleChoice(tile.getAttribute('data-name')));
-                tile.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        handleChoice(tile.getAttribute('data-name'));
-                    }
-                });
-            });
-            
-            // Keyboard shortcuts (1-5)
-            window.onkeydown = (e) => {
-                if (['1', '2', '3', '4', '5'].includes(e.key)) {
-                    const index = parseInt(e.key) - 1;
-                    const tile = document.querySelectorAll('#targets .tile-hover-effect')[index];
-                    if (tile) handleChoice(tile.getAttribute('data-name'));
-                }
-            };
-        }
-        
-        async function handleChoice(selectedName) {
-            const correctAnswer = state.current;
-            const isCorrect = selectedName === correctAnswer.name;
-            state.attempts++;
-            
-            // Highlight selected tile
-            document.querySelectorAll('#targets .tile-hover-effect').forEach(tile => {
-                tile.style.pointerEvents = 'none';
-                const tileName = tile.getAttribute('data-name');
-                
-                if (tileName === selectedName) {
-                    tile.classList.add(isCorrect ? 
-                        'bg-green-100 border-green-400' : 
-                        'bg-red-100 border-red-400');
-                }
-                
-                if (tileName === correctAnswer.name && !isCorrect) {
-                    tile.classList.add('bg-green-100', 'border-green-400');
-                }
-            });
-            
-            // Show feedback
-            await showFeedback(
-                isCorrect,
-                isCorrect ? `Correct — ${correctAnswer.name}` : `Incorrect. The answer was: ${correctAnswer.name}`,
-                correctAnswer.explain
-            );
-            
-            // Update score if correct
-            if (isCorrect) state.score++;
-            updateHUD();
-            
-            // Move to next question or finish game
-            nextQuestion();
-        }
-        
-        function updateHUD() {
-            $('#score').textContent = state.score;
-            const accuracy = state.attempts ? Math.round((state.score / state.attempts) * 100) : 0;
-            $('#acc').textContent = `${accuracy}%`;
-        }
-        
-        function updateProgress() {
-            const percent = Math.round(((state.qIndex + 1) / state.total) * 100);
-            const bar = $('#bar');
-            bar.style.width = `${percent}%`;
-            bar.textContent = `Question ${state.qIndex + 1} of ${state.total}`;
-        }
-        
-        function nextQuestion() {
-            state.qIndex++;
-            if (state.qIndex < state.total) {
-                renderQuestion();
-            } else {
-                finishGame();
-            }
-        }
-        
-        function finishGame() {
-            $('#game').classList.add('hidden');
-            $('#done').classList.remove('hidden');
-            
-            $('#finalScore').textContent = `${state.score}/${state.total}`;
-            const accuracy = state.attempts ? Math.round((state.score / state.attempts) * 100) : 0;
-            $('#finalAcc').textContent = `${accuracy}%`;
-        }
-        
-        async function showFeedback(isCorrect, message, explanation) {
-            const overlay = $('#overlay');
-            const fbox = $('#fbox');
-            const ficon = $('#ficon');
-            const fmsg = $('#fmsg');
-            const explain = $('#explain');
-            
-            // Style feedback box based on correctness
-            fbox.className = isCorrect ? 
-                'bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full relative border-4 border-green-400' : 
-                'bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full relative border-4 border-red-400';
-            
-            // Set feedback icon
-            ficon.textContent = isCorrect ? '✓' : '✗';
-            ficon.className = isCorrect ? 
-                'w-16 h-16 rounded-full bg-green-100 flex items-center justify-center text-green-500 text-3xl mx-auto mb-4' : 
-                'w-16 h-16 rounded-full bg-red-100 flex items-center justify-center text-red-500 text-3xl mx-auto mb-4';
-            
-            // Set message and explanation
-            fmsg.textContent = message;
-            fmsg.className = isCorrect ? 
-                'text-2xl font-bold text-center mb-4 text-green-600' : 
-                'text-2xl font-bold text-center mb-4 text-red-600';
-            
-            explain.textContent = explanation;
-            
-            // Show overlay
-            overlay.classList.remove('hidden');
-            
-            // Auto-close after delay
-            return new Promise(resolve => {
-                const timer = setTimeout(() => {
-                    overlay.classList.add('hidden');
-                    resolve();
-                }, 5000);
-                
-                // Allow manual close
-                overlay.addEventListener('click', (e) => {
-                    if (e.target === overlay) {
-                        clearTimeout(timer);
-                        overlay.classList.add('hidden');
-                        resolve();
-                    }
-                });
-            });
-        }
-        
-        // Initialize the game when DOM is loaded
-        document.addEventListener('DOMContentLoaded', initGame);
-    </script>
+  // Neutral, non-revealing emoji set
+  const neutralEmojis=["🧭","🧩","🎯","🧠","🔍","⚖️","🌐","📎","💡","📊","🛰️","🪄"];
+
+  function setScenarioEmoji(){
+    $('#scenarioEmoji').textContent = neutralEmojis[Math.floor(Math.random()*neutralEmojis.length)];
+  }
+
+  function startGame(n){
+    $('#welcome').style.display='none';
+    $('#done').style.display='none';
+    $('#game').style.display='grid';
+    state.deck=shuffle([...DATA]).slice(0,Math.min(n,DATA.length));
+    state.qIndex=0;state.score=0;state.attempts=0;state.total=state.deck.length;
+    $('#total').textContent=state.total;$('#score').textContent=0;$('#acc').textContent='0%';
+    renderQuestion();
+  }
+
+  function renderQuestion(){
+    const item=state.deck[state.qIndex]; state.current=item;
+    setScenarioEmoji();
+    $('#scenario').textContent=item.scenario;
+    updateProgress();
+
+    // 1 correct + 4 distractors
+    const pool=DATA.filter(x=>x.name!==item.name);
+    const distractors=shuffle(pool).slice(0,4);
+    const opts=shuffle([item,...distractors]);
+    const letters=['A','B','C','D','E'];
+
+    // Independent randomized decorative badges per render
+    const badgePool = shuffle([...neutralEmojis]);
+    const getBadge = i => badgePool[i % badgePool.length];
+
+    $('#targets').innerHTML=opts.map((o,i)=>`
+      <div class="tile" tabindex="0" role="button" aria-label="${o.name}" data-name="${o.name.replace(/"/g,'&quot;')}">
+        <div class="letter">${letters[i]}</div>
+        <div class="badge" aria-hidden="true" title="decorative">${getBadge(i)}</div>
+        <div>
+          <div class="tname">${o.name}</div>
+          <div class="tcat">${o.cat}</div>
+          <div class="tdesc">${o.tag||''}</div>
+        </div>
+      </div>`).join('');
+
+    const src=$('#dragSrc');
+    src.setAttribute('draggable','true');
+    src.addEventListener('dragstart',e=>{ e.dataTransfer.setData('text/plain','scenario'); src.setAttribute('aria-grabbed','true'); });
+    src.addEventListener('dragend',()=> src.setAttribute('aria-grabbed','false'));
+
+    document.querySelectorAll('.tile').forEach(tile=>{
+      tile.addEventListener('dragover',e=>{ e.preventDefault(); tile.style.borderColor='#6c74ff'; });
+      tile.addEventListener('dragleave',()=>{ tile.style.borderColor='transparent'; });
+      tile.addEventListener('drop',e=>{ e.preventDefault(); tile.style.borderColor='transparent'; handleChoice(tile.getAttribute('data-name')); });
+      tile.addEventListener('click',()=> handleChoice(tile.getAttribute('data-name')));
+      tile.addEventListener('keydown',e=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); handleChoice(tile.getAttribute('data-name')); }});
+    });
+
+    // keyboard 1–5
+    window.onkeydown=e=>{
+      if(['1','2','3','4','5'].includes(e.key)){
+        const idx=parseInt(e.key,10)-1; const t=document.querySelectorAll('.tile')[idx]; if(t) handleChoice(t.getAttribute('data-name'));
+      }
+    };
+  }
+
+  async function handleChoice(name){
+    const correct=state.current; const ok = name===correct.name; state.attempts++;
+
+    document.querySelectorAll('.tile').forEach(t=>{
+      const isSel = t.getAttribute('data-name')===name;
+      if(isSel) t.classList.add(ok? 'correct':'incorrect');
+      t.style.pointerEvents='none';
+    });
+
+    await showFeedback(ok, ok?`Correct — ${correct.name}`:`Not quite. Answer: ${correct.name}`, correct.explain);
+    if(ok) state.score++;
+    updateHUD(); next();
+  }
+
+  function updateHUD(){
+    $('#score').textContent=state.score;
+    const acc=state.attempts?Math.round((state.score/state.attempts)*100):0;
+    $('#acc').textContent=acc+'%';
+  }
+
+  function updateProgress(){
+    const pct=Math.round(((state.qIndex+1)/state.total)*100);
+    const bar=$('#bar'); bar.style.width=pct+'%'; bar.textContent=`Question ${state.qIndex+1} of ${state.total}`;
+  }
+
+  function next(){
+    state.qIndex++;
+    if(state.qIndex<state.total){renderQuestion();} else {finish();}
+  }
+
+  function finish(){
+    $('#game').style.display='none';
+    $('#done').style.display='grid';
+    $('#finalScore').textContent=`${state.score}/${state.total}`;
+    const acc=state.attempts?Math.round((state.score/state.attempts)*100):0;
+    $('#finalAcc').textContent=acc+'%';
+  }
+
+  // Feedback overlay (auto-close 6s)
+  const AUTO_CLOSE_MS=6000;
+  function showFeedback(ok,msg,explain){
+    return new Promise(resolve=>{
+      const o=$('#overlay'), box=$('#fbox'), close=$('#closex');
+      box.className='fbox '+(ok?'correct':'incorrect');
+      $('#ficon').textContent=ok?'✓':'✗';
+      $('#fmsg').textContent=msg; $('#explain').textContent=explain||'';
+      o.classList.add('show');
+      const cleanup=()=>{ o.classList.remove('show'); close.removeEventListener('click',onClose); document.removeEventListener('keydown',onEsc); clearTimeout(timer); resolve(); };
+      const onClose=()=>cleanup(); const onEsc=e=>{ if(e.key==='Escape') cleanup(); };
+      close.addEventListener('click',onClose); document.addEventListener('keydown',onEsc);
+      const timer=setTimeout(()=>cleanup(),AUTO_CLOSE_MS);
+      o.addEventListener('click',e=>{ if(e.target===o) cleanup(); },{once:true});
+    });
+  }
+
+  // Buttons
+  $('#startQuick').addEventListener('click',()=>startGame(10));
+  $('#startFull').addEventListener('click',()=>startGame(DATA.length));
+  $('#playAgain').addEventListener('click',()=>document.location.reload());
+</script>
 </body>
 </html>
