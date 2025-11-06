@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>AI Cognitive Bias Matcher - PCA Presentation (v5)</title>
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    html,body{height:100%}
+    html,body{height:100%;touch-action:manipulation}
     body{
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
       background:radial-gradient(1200px 800px at 10% 10%,#7aa2ff33,transparent 60%),
@@ -18,77 +18,115 @@
     .card{background:#fff;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.18);padding:24px;animation:fadeIn .4s ease}
 
     /* Welcome */
-    .welcome{height:100%;display:grid;place-items:center}
-    .welcome-inner{max-width:980px}
-    .welcome h1{font-size:clamp(1.6rem,3.2vw,2.6rem);color:#fff;text-shadow:0 2px 16px rgba(0,0,0,.25);margin-bottom:14px;text-align:center}
-    .welcome .card h2{color:#667eea;font-size:1.4rem;margin-bottom:6px}
-    .welcome .card p{color:#555;line-height:1.55;font-size:1rem;margin:10px auto;max-width:860px}
+    .welcome{height:100%;display:grid;place-items:center;overflow-y:auto}
+    .welcome-inner{max-width:980px;padding:10px}
+    .welcome h1{font-size:clamp(1.4rem,5vw,2.6rem);color:#fff;text-shadow:0 2px 16px rgba(0,0,0,.25);margin-bottom:14px;text-align:center}
+    .welcome .card h2{color:#667eea;font-size:clamp(1.2rem,4vw,1.4rem);margin-bottom:6px}
+    .welcome .card p{color:#555;line-height:1.55;font-size:clamp(0.9rem,3vw,1rem);margin:10px auto;max-width:860px}
     .actions{display:flex;gap:12px;justify-content:center;margin-top:18px;flex-wrap:wrap}
-    .btn{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border:0;border-radius:999px;padding:14px 22px;font-size:1rem;cursor:pointer;box-shadow:0 10px 24px rgba(102,126,234,.45);transition:transform .18s ease,box-shadow .18s ease}
+    .btn{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border:0;border-radius:999px;padding:14px 22px;font-size:1rem;cursor:pointer;box-shadow:0 10px 24px rgba(102,126,234,.45);transition:transform .18s ease,box-shadow .18s ease;min-height:48px;min-width:140px}
     .btn:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(102,126,234,.6)}
+    .btn:active{transform:translateY(0)}
     .btn.secondary{background:#fff;color:#5b67e5;border:2px solid #5b67e5;box-shadow:none}
     .btn.secondary:hover{background:#f5f6ff}
 
     /* Game */
     .game{display:none;height:100%;grid-template-rows:auto 10px 1fr;gap:10px}
-    .header{display:flex;justify-content:space-between;align-items:center;gap:12px}
-    .title{color:#fff;text-shadow:0 2px 16px rgba(0,0,0,.3);font-weight:700;font-size:clamp(1.1rem,2.2vw,1.6rem)}
-    .hud.card{display:flex;align-items:center;justify-content:space-between;gap:18px}
-    .stat{display:flex;align-items:center;gap:8px;font-weight:600;color:#667eea}
+    .header{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+    .title{color:#fff;text-shadow:0 2px 16px rgba(0,0,0,.3);font-weight:700;font-size:clamp(1rem,3.5vw,1.6rem)}
+    .hud.card{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px}
+    .stat{display:flex;align-items:center;gap:6px;font-weight:600;color:#667eea;font-size:clamp(0.85rem,2.5vw,1rem)}
     .stat small{color:#555;font-weight:500}
     .progress{background:#ffffff55;border-radius:8px;overflow:hidden;height:10px}
     .bar{height:100%;width:0;background:linear-gradient(90deg,#4caf50 0%,#8bc34a 100%);color:#fff;font-size:.7rem;line-height:10px;text-align:center;transition:width .45s ease}
-    .main{display:grid;grid-template-columns:1.2fr 1fr;gap:10px;height:calc(100% - 0px)}
+    .main{display:grid;grid-template-columns:1fr;gap:10px;height:100%;overflow-y:auto}
 
-    /* Scenario draggable */
-    .scenario.card{display:grid;grid-template-rows:auto auto 1fr auto;place-items:center;text-align:center}
-    .scenario .label{color:#764ba2;font-size:.8rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
-    .scenario-img{max-width:220px;border-radius:10px;margin-bottom:12px;box-shadow:0 4px 10px rgba(0,0,0,.2)}
-    .dragSrc{user-select:none;cursor:grab;background:#f8f9ff;border:2px dashed #667eea;padding:16px;border-radius:12px;max-width:92%}
-    .dragSrc:active{cursor:grabbing}
-    .scenario .text{font-size:clamp(1rem,1.6vw,1.2rem);line-height:1.45;color:#222}
-    .dragTip{font-size:.85rem;color:#666;margin-top:10px}
+    /* Scenario */
+    .scenario.card{display:grid;grid-template-rows:auto auto 1fr auto;place-items:center;text-align:center;padding:16px;min-height:0}
+    .scenario .label{color:#764ba2;font-size:.75rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+    .scenario-img{max-width:180px;border-radius:10px;margin-bottom:12px;box-shadow:0 4px 10px rgba(0,0,0,.2)}
+    .dragSrc{user-select:none;cursor:pointer;background:#f8f9ff;border:2px dashed #667eea;padding:14px;border-radius:12px;max-width:100%;touch-action:none}
+    .dragSrc.dragging{opacity:0.5;border-color:#764ba2}
+    .scenario .text{font-size:clamp(0.9rem,3vw,1.2rem);line-height:1.45;color:#222}
+    .dragTip{font-size:.8rem;color:#666;margin-top:8px}
 
     /* Drop targets */
-    .choices.card{display:grid;grid-template-rows:auto 1fr;overflow:hidden}
-    .choices h3{color:#667eea;margin-bottom:6px}
-    .targets{display:grid;grid-template-columns:1fr;gap:8px;align-content:center}
-    .tile{display:flex;align-items:center;gap:12px;border-radius:12px;border:3px solid transparent;background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);padding:12px 14px;transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease}
-    .tile:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.2);border-color:#667eea;background:linear-gradient(135deg,#e3f2fd 0%,#bbdefb 100%)}
-    .tile .letter{background:#667eea;color:#fff;width:34px;height:34px;display:grid;place-items:center;border-radius:999px;font-weight:800;flex-shrink:0}
+    .choices.card{display:grid;grid-template-rows:auto 1fr;overflow:hidden;padding:16px;min-height:0}
+    .choices h3{color:#667eea;margin-bottom:8px;font-size:clamp(1rem,3.5vw,1.2rem)}
+    .targets{display:grid;grid-template-columns:1fr;gap:8px;align-content:start;overflow-y:auto;padding-right:4px}
+    .tile{display:flex;align-items:center;gap:10px;border-radius:12px;border:3px solid transparent;background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);padding:12px;transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease;cursor:pointer;min-height:48px;touch-action:manipulation}
+    .tile:hover,.tile:active{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.2);border-color:#667eea;background:linear-gradient(135deg,#e3f2fd 0%,#bbdefb 100%)}
+    .tile.over{border-color:#667eea;background:linear-gradient(135deg,#e3f2fd 0%,#bbdefb 100%)}
+    .tile .letter{background:#667eea;color:#fff;width:32px;height:32px;display:grid;place-items:center;border-radius:999px;font-weight:800;flex-shrink:0;font-size:0.9rem}
     .tile.correct{background:linear-gradient(135deg,#84fab0 0%,#8fd3f4 100%);border-color:#2e7d32}
     .tile.incorrect{background:linear-gradient(135deg,#ff9a9e 0%,#fecfef 100%);border-color:#c62828}
-    .tname{font-weight:700;color:#222;font-size:.98rem}
-    .tcat{font-size:.8rem;color:#555;font-style:italic}
-    .tdesc{font-size:.82rem;color:#444;margin-top:2px}
+    .tname{font-weight:700;color:#222;font-size:clamp(0.85rem,2.8vw,0.98rem)}
+    .tcat{font-size:clamp(0.7rem,2.3vw,0.8rem);color:#555;font-style:italic}
+    .tdesc{font-size:clamp(0.75rem,2.5vw,0.82rem);color:#444;margin-top:2px}
 
     /* Overlay */
-    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:999;animation:fadeIn .2s ease}
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:999;animation:fadeIn .2s ease;padding:16px}
     .overlay.show{display:flex}
-    .fbox{background:#fff;padding:36px 48px;border-radius:14px;text-align:center;box-shadow:0 16px 36px rgba(0,0,0,.35);animation:scaleIn .25s ease;max-width:760px;position:relative}
-    .fbox h2{font-size:2.2rem;margin-bottom:10px}
+    .fbox{background:#fff;padding:24px;border-radius:14px;text-align:center;box-shadow:0 16px 36px rgba(0,0,0,.35);animation:scaleIn .25s ease;max-width:90vw;max-height:90vh;overflow-y:auto;position:relative}
+    .fbox h2{font-size:clamp(1.6rem,6vw,2.2rem);margin-bottom:10px}
     .fbox.correct h2{color:#2e7d32}
     .fbox.incorrect h2{color:#c62828}
-    .fbox p{color:#444;font-size:1.05rem}
-    .explain{margin-top:10px;color:#333;font-size:.98rem}
-    .closex{position:absolute;top:10px;right:10px;border:none;background:#eef;color:#4b57d6;width:34px;height:34px;border-radius:50%;font-weight:800;cursor:pointer}
+    .fbox p{color:#444;font-size:clamp(0.9rem,3vw,1.05rem);line-height:1.5}
+    .explain{margin-top:10px;color:#333;font-size:clamp(0.85rem,2.8vw,0.98rem);line-height:1.5}
+    .closex{position:absolute;top:8px;right:8px;border:none;background:#eef;color:#4b57d6;width:36px;height:36px;border-radius:50%;font-weight:800;cursor:pointer;font-size:1.2rem}
     .closex:hover{filter:brightness(.95)}
-    .stay{margin-top:12px;font-size:.85rem;color:#666}
+    .stay{margin-top:12px;font-size:clamp(0.75rem,2.5vw,0.85rem);color:#666}
 
     /* Done */
-    .done{display:none;height:100%;place-items:center;text-align:center}
-    .done h1{color:#4caf50;font-size:clamp(1.6rem,3vw,2.6rem);margin-bottom:10px}
-    .stats{display:flex;gap:20px;justify-content:center;margin:18px 0 10px;flex-wrap:wrap}
-    .statbox{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:22px 28px;border-radius:14px;min-width:160px}
-    .statbox .lab{opacity:.92;font-size:.95rem}
-    .statbox .val{font-weight:800;font-size:2rem}
+    .done{display:none;height:100%;place-items:center;text-align:center;overflow-y:auto;padding:16px}
+    .done h1{color:#4caf50;font-size:clamp(1.6rem,6vw,2.6rem);margin-bottom:10px}
+    .stats{display:flex;gap:16px;justify-content:center;margin:18px 0 10px;flex-wrap:wrap}
+    .statbox{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:18px 24px;border-radius:14px;min-width:140px}
+    .statbox .lab{opacity:.92;font-size:clamp(0.85rem,2.8vw,0.95rem)}
+    .statbox .val{font-weight:800;font-size:clamp(1.6rem,6vw,2rem)}
 
     /* Animations */
     @keyframes fadeIn{from{opacity:0}to{opacity:1}}
     @keyframes scaleIn{from{transform:scale(.88)}to{transform:scale(1)}}
 
-    @media (max-width:900px){.main{grid-template-columns:1fr;grid-template-rows:1fr 1fr}.scenario .text{max-width:96%}.targets{grid-template-columns:1fr}}
-    @media (min-width:901px){.targets{grid-template-columns:1fr}}
+    /* Mobile optimizations */
+    @media (max-width:768px){
+      body{padding:5px}
+      .container{width:100vw;height:100vh}
+      .card{padding:16px;border-radius:12px}
+      .welcome .card{padding:20px}
+      .game{gap:8px}
+      .header{gap:6px}
+      .hud.card{padding:10px 12px;gap:8px}
+      .stat{gap:4px;font-size:0.85rem}
+      .main{gap:8px}
+      .scenario.card{padding:12px}
+      .scenario-img{max-width:140px;margin-bottom:8px}
+      .dragSrc{padding:12px}
+      .dragTip{font-size:0.75rem;margin-top:6px}
+      .choices.card{padding:12px}
+      .targets{gap:6px}
+      .tile{padding:10px;gap:8px}
+      .tile .letter{width:28px;height:28px;font-size:0.85rem}
+      .fbox{padding:20px}
+      .actions{gap:10px}
+      .btn{padding:12px 18px;font-size:0.95rem;min-width:120px}
+      .statbox{padding:16px 20px;min-width:120px}
+    }
+
+    @media (max-width:480px){
+      .scenario-img{max-width:120px}
+      .tile{padding:8px;gap:6px}
+      .tile .letter{width:26px;height:26px;font-size:0.8rem}
+      .fbox{padding:16px}
+      .btn{padding:10px 16px;font-size:0.9rem;min-width:100px}
+    }
+
+    /* Landscape mobile */
+    @media (max-width:900px) and (orientation:landscape){
+      .main{grid-template-columns:1fr 1fr;grid-template-rows:1fr}
+      .scenario .text{max-width:96%}
+    }
   </style>
 </head>
 <body>
@@ -99,7 +137,7 @@
         <div class="card">
           <h2>Welcome, Counselors!</h2>
           <p>Understanding our cognitive biases about AI helps us serve clients more effectively and embrace technological opportunities without fear or denial.</p>
-          <p>In this interactive game, you'll match real-world scenarios with the cognitive biases and fallacies that might be at play. <strong>Drag the scenario card onto the correct fallacy name</strong> (or click a tile to select).</p>
+          <p>In this interactive game, you'll match real-world scenarios with the cognitive biases and fallacies that might be at play. <strong>Tap/drag the scenario card onto the correct fallacy name</strong> (or tap a tile to select).</p>
           <p class="small">Quick Play gives you 10 randomized rounds. Full Deck uses all items in the complete set (36).</p>
           <div class="actions">
             <button class="btn" id="startQuick">🚀 Quick Play (10)</button>
@@ -125,10 +163,10 @@
           <div id="dragSrc" class="dragSrc" draggable="true" aria-grabbed="false">
             <div class="text" id="scenario"></div>
           </div>
-          <div class="dragTip">Drag this card onto a fallacy tile →</div>
+          <div class="dragTip">Tap/drag this card onto a fallacy tile ↓</div>
         </div>
         <div class="choices card">
-          <h3>Drop onto the correct fallacy</h3>
+          <h3>Tap or drop onto the correct fallacy</h3>
           <div class="targets" id="targets"></div>
         </div>
       </div>
@@ -137,7 +175,7 @@
     <section class="done" id="done">
       <div class="card" style="max-width:900px;">
         <h1>🎉 Game Complete!</h1>
-        <p style="color:#555;font-size:1.05rem">Thoughtful integration beats fear—augment, don’t replace, human care.</p>
+        <p style="color:#555;font-size:1.05rem">Thoughtful integration beats fear—augment, don't replace, human care.</p>
         <div class="stats">
           <div class="statbox"><div class="lab">Final Score</div><div class="val" id="finalScore">0</div></div>
           <div class="statbox"><div class="lab">Accuracy</div><div class="val" id="finalAcc">0%</div></div>
@@ -156,23 +194,22 @@
       <h2 id="ficon">✓</h2>
       <p id="fmsg"></p>
       <div class="explain" id="explain"></div>
-      <div class="stay">(Closes in <span id="count">8</span>s — or press <strong>Esc</strong>, click outside, or ×)</div>
+      <div class="stay">(Closes in <span id="count">8</span>s — or press <strong>Esc</strong>, tap outside, or ×)</div>
     </div>
   </div>
 
 <script>
-  // === 36-item dataset, aligned to your scenarios with precise bias/fallacy matches ===
-  // Add optional images in /images; the <img> hides gracefully if not found.
+  // === 36-item dataset ===
   const DATA = [
     {name:"Status Quo Bias",cat:"Resistance",icon:"🔒",img:"status-quo.jpg",
      tag:"Preferring the familiar—even when a better path is clear.",
      explain:`Tendency to keep current routines because change feels costly or risky.`,
-     scenario:`A therapist insists on using only paper intake forms because “my current system works fine,” despite clients requesting digital options and missing appointments due to paperwork delays.`},
+     scenario:`A therapist insists on using only paper intake forms because "my current system works fine," despite clients requesting digital options and missing appointments due to paperwork delays.`},
 
     {name:"Belief Perseverance",cat:"Reasoning",icon:"🧱",img:"belief-perseverance.jpg",
      tag:"Clinging to a belief despite clear contrary evidence.",
      explain:`Existing beliefs are maintained even after receiving disconfirming evidence.`,
-     scenario:`A clinical supervisor dismisses AI-assisted note-taking as “just a fad,” even after three colleagues report saving 5+ hours weekly and having more energy for client care.`},
+     scenario:`A clinical supervisor dismisses AI-assisted note-taking as "just a fad," even after three colleagues report saving 5+ hours weekly and having more energy for client care.`},
 
     {name:"Normalcy Bias",cat:"Resistance",icon:"📅",img:"normalcy-bias.jpg",
      tag:"Assuming tomorrow will look like yesterday.",
@@ -182,42 +219,42 @@
     {name:"Attitude Polarization",cat:"Reasoning",icon:"🌓",img:"attitude-polarization.jpg",
      tag:"Pre‑judging; exposure to mixed info hardens the initial stance.",
      explain:`Evaluating new information in a way that strengthens preexisting views.`,
-     scenario:`Before attending a workshop on AI tools for therapists, a counselor declares “machines can never understand emotions” and decides the training will be useless.`},
+     scenario:`Before attending a workshop on AI tools for therapists, a counselor declares "machines can never understand emotions" and decides the training will be useless.`},
 
     {name:"Rationalization",cat:"Defense",icon:"🎭",img:"rationalization.jpg",
      tag:"Plausible-sounding excuses that mask avoidance.",
      explain:`Constructing reasons that soothe discomfort rather than reflect reality.`,
-     scenario:`A psychologist creates elaborate arguments about “the sacred therapeutic relationship” to avoid learning AI documentation tools, despite spending 2 hours nightly on paperwork instead of self‑care.`},
+     scenario:`A psychologist creates elaborate arguments about "the sacred therapeutic relationship" to avoid learning AI documentation tools, despite spending 2 hours nightly on paperwork instead of self‑care.`},
 
     {name:"Appeal to Tradition",cat:"Fallacy",icon:"📜",img:"appeal-to-tradition.jpg",
-     tag:"“We’ve always done it this way,” therefore it’s best.",
+     tag:""We've always done it this way," therefore it's best.",
      explain:`Arguing from custom rather than evidence, outcomes, or values.`,
-     scenario:`A counselor argues against telehealth platforms with AI scheduling because “therapists have always met clients face‑to‑face for 100 years, and we shouldn’t change that now.”`},
+     scenario:`A counselor argues against telehealth platforms with AI scheduling because "therapists have always met clients face‑to‑face for 100 years, and we shouldn't change that now."`},
 
     {name:"In‑group Bias",cat:"Fairness",icon:"👥",img:"ingroup-bias.jpg",
      tag:"Serving those like us, overlooking those unlike us.",
-     explain:`Favoring one’s own group—even when others could benefit.`,
+     explain:`Favoring one's own group—even when others could benefit.`,
      scenario:`A therapy clinic serves only affluent clients who can afford in‑person sessions, refusing to adopt AI‑enhanced teletherapy that could reach underserved rural communities.`},
 
     {name:"Catastrophizing",cat:"Distortion",icon:"💥",img:"catastrophizing.jpg",
      tag:"Jumping straight from change to doom.",
      explain:`Overestimating worst‑case outcomes while neglecting realistic positives.`,
-     scenario:`A counselor hears about AI therapy chatbots and immediately concludes “this is the end of our profession—we’ll all be replaced within months,” refusing to explore how AI might assist rather than replace.`},
+     scenario:`A counselor hears about AI therapy chatbots and immediately concludes "this is the end of our profession—we'll all be replaced within months," refusing to explore how AI might assist rather than replace.`},
 
     {name:"Ambiguity Aversion",cat:"Risk",icon:"😰",img:"ambiguity-aversion.jpg",
      tag:"Unknowns feel riskier than known flaws.",
      explain:`Preference for familiar risks over uncertain alternatives.`,
-     scenario:`A therapist who has never tried AI tools expresses intense anxiety about “robots taking over therapy” but becomes curious and calm after a 20‑minute demo of AI transcription.`},
+     scenario:`A therapist who has never tried AI tools expresses intense anxiety about "robots taking over therapy" but becomes curious and calm after a 20‑minute demo of AI transcription.`},
 
     {name:"Identity‑Protective Cognition",cat:"Social",icon:"🛡️",img:"identity-threat.jpg",
      tag:"Protecting status/role by rejecting new information.",
-     explain:`Discarding evidence that seems to diminish one’s professional identity.`,
-     scenario:`When AI diagnostic support tools are introduced, a senior therapist argues passionately that “using technology shows we’re not real clinicians” to protect their sense of expertise.`},
+     explain:`Discarding evidence that seems to diminish one's professional identity.`,
+     scenario:`When AI diagnostic support tools are introduced, a senior therapist argues passionately that "using technology shows we're not real clinicians" to protect their sense of expertise.`},
 
     {name:"Negativity Bias",cat:"Attention",icon:"📉",img:"negativity-bias.jpg",
      tag:"Bad news sticks; good news slides off.",
      explain:`Attending to and recalling negative information more strongly.`,
-     scenario:`A counselor becomes obsessed with articles predicting “AI will eliminate all therapy jobs by 2030,” checking daily for apocalyptic news rather than learning adaptive skills.`},
+     scenario:`A counselor becomes obsessed with articles predicting "AI will eliminate all therapy jobs by 2030," checking daily for apocalyptic news rather than learning adaptive skills.`},
 
     {name:"Ostrich Effect (Information Avoidance)",cat:"Attention",icon:"🪶",img:"ostrich-effect.jpg",
      tag:"Avoiding info that could cause psychological discomfort.",
@@ -225,7 +262,7 @@
      scenario:`A therapist avoids even reading about AI mental health tools because the unfamiliarity makes them anxious, preferring to stay in their comfort zone regardless of client needs.`},
 
     {name:"Availability Heuristic",cat:"Judgment",icon:"📰",img:"availability-heuristic.jpg",
-     tag:"What’s vivid feels frequent or likely.",
+     tag:"What's vivid feels frequent or likely.",
      explain:`Estimating risk by ease of recall, not base rates.`,
      scenario:`After reading one viral article about an AI chatbot giving harmful advice, a counselor assumes all AI mental health tools are dangerous, ignoring thousands of successful clinical implementations.`},
 
@@ -237,42 +274,42 @@
     {name:"Cognitive Dissonance",cat:"Conflict",icon:"😵",img:"cognitive-dissonance.jpg",
      tag:"Tension between cherished beliefs and new facts.",
      explain:`Psychological discomfort from holding conflicting ideas/behaviors.`,
-     scenario:`A counselor who claims “AI has no place in therapy” feels uncomfortable when their favorite professional development platform uses AI to personalize course recommendations and becomes defensive.`},
+     scenario:`A counselor who claims "AI has no place in therapy" feels uncomfortable when their favorite professional development platform uses AI to personalize course recommendations and becomes defensive.`},
 
     {name:"Need for Closure",cat:"Motivation",icon:"🚪",img:"need-for-closure.jpg",
      tag:"Craving a definitive answer right now.",
      explain:`Low tolerance for uncertainty or open‑ended inquiry.`,
-     scenario:`When asked about AI in counseling, a therapist quickly declares “it’s either good or bad—I need to decide now” instead of exploring the nuanced implications over time.`},
+     scenario:`When asked about AI in counseling, a therapist quickly declares "it's either good or bad—I need to decide now" instead of exploring the nuanced implications over time.`},
 
     {name:"Intolerance of Uncertainty",cat:"Risk",icon:"⚖️",img:"intolerance-uncertainty.jpg",
-     tag:"If it isn’t guaranteed, it can’t be tried.",
+     tag:"If it isn't guaranteed, it can't be tried.",
      explain:`Difficulty proceeding amid reasonable unknowns.`,
-     scenario:`A supervisor demands absolute certainty about AI’s future impact on therapy before considering any pilot program, unable to proceed with reasonable uncertainty.`},
+     scenario:`A supervisor demands absolute certainty about AI's future impact on therapy before considering any pilot program, unable to proceed with reasonable uncertainty.`},
 
     {name:"Red Herring",cat:"Fallacy",icon:"🐟",img:"red-herring.jpg",
      tag:"Changing the topic to dodge the decision.",
      explain:`Introducing an irrelevant issue to avoid the core question.`,
-     scenario:`During a discussion about using AI for scheduling efficiency, a therapist derails the conversation by debating whether AI has “true consciousness,” avoiding practical planning.`},
+     scenario:`During a discussion about using AI for scheduling efficiency, a therapist derails the conversation by debating whether AI has "true consciousness," avoiding practical planning.`},
 
     {name:"Attentional Bias",cat:"Attention",icon:"🎯",img:"attentional-bias.jpg",
      tag:"Fixating on one feature; ignoring the rest.",
      explain:`Over‑weighting a salient attribute while neglecting broader impacts.`,
-     scenario:`A counselor fixates on AI’s lack of empathy while ignoring how AI administrative tools could give them 10 more hours weekly for actual empathetic client contact.`},
+     scenario:`A counselor fixates on AI's lack of empathy while ignoring how AI administrative tools could give them 10 more hours weekly for actual empathetic client contact.`},
 
     {name:"Information Bias (Analysis Paralysis)",cat:"Decision",icon:"🧮",img:"information-bias.jpg",
-     tag:"Seeking info that won’t change the decision instead of testing.",
+     tag:"Seeking info that won't change the decision instead of testing.",
      explain:`Overvaluing additional discussion/research when a small experiment would be more informative.`,
      scenario:`A therapy group spends six months debating whether to try AI transcription without ever running a simple 2‑week pilot that would provide real data about its usefulness.`},
 
     {name:"Sunk Cost Fallacy",cat:"Decision",icon:"💸",img:"sunk-cost.jpg",
      tag:"Past effort traps present choices.",
      explain:`Continuing an inferior option due to prior investment.`,
-     scenario:`A counselor continues using an outdated practice management system because “I invested so much time learning it” even though AI‑enhanced alternatives would save hours and reduce errors.`},
+     scenario:`A counselor continues using an outdated practice management system because "I invested so much time learning it" even though AI‑enhanced alternatives would save hours and reduce errors.`},
 
     {name:"False Dichotomy",cat:"Fallacy",icon:"⚡",img:"false-dichotomy.jpg",
      tag:"Only two extreme choices—or so it seems.",
      explain:`Forcing an either/or frame while ignoring middle paths.`,
-     scenario:`A therapist insists “we either embrace AI completely and lose our humanity, or reject it entirely and stay authentic,” ignoring the middle ground of thoughtful, selective integration.`},
+     scenario:`A therapist insists "we either embrace AI completely and lose our humanity, or reject it entirely and stay authentic," ignoring the middle ground of thoughtful, selective integration.`},
 
     {name:"Anchoring",cat:"Judgment",icon:"⚓",img:"anchoring.jpg",
      tag:"First beliefs set the reference point.",
@@ -282,47 +319,47 @@
     {name:"Cognitive Dissonance (Resolution)",cat:"Conflict",icon:"🔄",img:"dissonance-resolution.jpg",
      tag:"Updating beliefs can feel awkward before it feels right.",
      explain:`Adjusting beliefs/behaviors to reduce dissonance after new evidence.`,
-     scenario:`A counselor updates their belief that “technology always depersonalizes care” after using AI tools that actually increase client face‑time, causing temporary mental discomfort during the shift.`},
+     scenario:`A counselor updates their belief that "technology always depersonalizes care" after using AI tools that actually increase client face‑time, causing temporary mental discomfort during the shift.`},
 
     {name:"Motivated Reasoning",cat:"Reasoning",icon:"🧠",img:"motivated-reasoning.jpg",
      tag:"Reasoning toward the conclusion we prefer.",
      explain:`Evaluating evidence based on desired conclusions rather than accuracy.`,
-     scenario:`A therapist insists “humans are inherently better at therapy” as a psychological comfort, even when AI‑supported interventions show equal or better outcomes in certain contexts.`},
+     scenario:`A therapist insists "humans are inherently better at therapy" as a psychological comfort, even when AI‑supported interventions show equal or better outcomes in certain contexts.`},
 
     {name:"Argument from Incredulity",cat:"Fallacy",icon:"❓",img:"incredulity.jpg",
-     tag:"“I can’t imagine it, so it can’t be true.”",
+     tag:""I can't imagine it, so it can't be true."",
      explain:`Concluding something is false because it seems hard to believe.`,
-     scenario:`A counselor dismisses AI mood‑tracking apps because “only humans can understand emotions,” excluding the possibility that pattern recognition might complement human intuition.`},
+     scenario:`A counselor dismisses AI mood‑tracking apps because "only humans can understand emotions," excluding the possibility that pattern recognition might complement human intuition.`},
 
     {name:"Loss Aversion",cat:"Decision",icon:"📉",img:"loss-aversion.jpg",
      tag:"Losses loom larger than equal gains.",
      explain:`Overweighting potential losses relative to similar gains.`,
-     scenario:`A newly licensed therapist lies awake worrying “AI will make my degree worthless” instead of exploring how to develop AI‑complementary skills that increase their marketability.`},
+     scenario:`A newly licensed therapist lies awake worrying "AI will make my degree worthless" instead of exploring how to develop AI‑complementary skills that increase their marketability.`},
 
     {name:"Availability Cascade",cat:"Social",icon:"📢",img:"availability-cascade.jpg",
      tag:"Repeated claims start to feel like facts.",
      explain:`Perceived truth increases as ideas are amplified through repetition.`,
-     scenario:`A therapist repeatedly watches videos predicting “AI will destroy mental health care” to fuel their anger and anxiety, spending hours in outrage rather than constructive learning.`},
+     scenario:`A therapist repeatedly watches videos predicting "AI will destroy mental health care" to fuel their anger and anxiety, spending hours in outrage rather than constructive learning.`},
 
     {name:"Anthropomorphism",cat:"Attribution",icon:"🤖",img:"anthropomorphism.jpg",
      tag:"Giving tools human motives and feelings.",
      explain:`Ascribing intention or emotion to a nonhuman system.`,
-     scenario:`A counselor treats an AI chatbot as if it has feelings and intentions, telling colleagues “the AI is trying to replace us” as if the tool has motivations rather than functions.`},
+     scenario:`A counselor treats an AI chatbot as if it has feelings and intentions, telling colleagues "the AI is trying to replace us" as if the tool has motivations rather than functions.`},
 
     {name:"Automation Bias",cat:"Trust",icon:"✨",img:"automation-bias.jpg",
      tag:"Over‑trusting the system; under‑checking yourself.",
      explain:`Excessive reliance on automated outputs over professional judgment.`,
-     scenario:`A therapist prefers consulting AI for clinical advice over peer consultation because “AI never judges my questions,” avoiding the valuable but imperfect feedback from colleagues.`},
+     scenario:`A therapist prefers consulting AI for clinical advice over peer consultation because "AI never judges my questions," avoiding the valuable but imperfect feedback from colleagues.`},
 
     {name:"Projection",cat:"Defense",icon:"🪞",img:"projection.jpg",
      tag:"My fear, your problem.",
-     explain:`Attributing one’s own uncomfortable feelings to others.`,
-     scenario:`A counselor who secretly fears inadequacy accuses others who use AI tools of “feeling threatened and trying to cheat,” projecting their own insecurities onto colleagues.`},
+     explain:`Attributing one's own uncomfortable feelings to others.`,
+     scenario:`A counselor who secretly fears inadequacy accuses others who use AI tools of "feeling threatened and trying to cheat," projecting their own insecurities onto colleagues.`},
 
     {name:"Illusory Pattern (Conspiracy Thinking)",cat:"Perception",icon:"🕵️",img:"illusory-pattern.jpg",
      tag:"Seeing plots where none exist.",
      explain:`Detecting intent/patterns in unrelated events.`,
-     scenario:`A therapist believes tech companies are “secretly programming AI to destroy the counseling profession” and sees evidence of this conspiracy in every AI mental health announcement.`},
+     scenario:`A therapist believes tech companies are "secretly programming AI to destroy the counseling profession" and sees evidence of this conspiracy in every AI mental health announcement.`},
 
     {name:"Magical Thinking",cat:"Distortion",icon:"✨",img:"magical-thinking.jpg",
      tag:"Wishful or mystical causality replaces evidence.",
@@ -335,20 +372,20 @@
      scenario:`A therapist spends hours daily asking AI to validate increasingly detached theories about therapy, creating an isolated intellectual bubble disconnected from clinical reality and peer feedback.`},
 
     {name:"Illusory Superiority",cat:"Self",icon:"🏆",img:"illusory-superiority.jpg",
-     tag:"Believing you’re uniquely exempt or chosen.",
-     explain:`Overestimating one’s special status or abilities relative to peers.`,
-     scenario:`A counselor believes AI has “chosen them” to receive special insights about the future of therapy, claiming a unique destiny that sets them apart from “ordinary” colleagues.`},
+     tag:"Believing you're uniquely exempt or chosen.",
+     explain:`Overestimating one's special status or abilities relative to peers.`,
+     scenario:`A counselor believes AI has "chosen them" to receive special insights about the future of therapy, claiming a unique destiny that sets them apart from "ordinary" colleagues.`},
 
     {name:"Overconfidence Effect",cat:"Judgment",icon:"📈",img:"overconfidence.jpg",
      tag:"Confidence outpaces calibration.",
      explain:`Subjective confidence exceeds objective accuracy or feedback.`,
-     scenario:`A therapist stops attending peer supervision, believing only AI understands their “revolutionary” views on mental health, cutting themselves off from professional community.`}
+     scenario:`A therapist stops attending peer supervision, believing only AI understands their "revolutionary" views on mental health, cutting themselves off from professional community.`}
   ];
 
   // ---- State & helpers ----
   const $=s=>document.querySelector(s);
   const shuffle=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);
-  const state={deck:[],qIndex:0,score:0,attempts:0,total:0,current:null};
+  const state={deck:[],qIndex:0,score:0,attempts:0,total:0,current:null,dragElement:null,touchStartY:0};
 
   function startGame(n){
     $('#welcome').style.display='none';
@@ -394,24 +431,85 @@
         </div>
       </div>`).join('');
 
-    // dnd + clicks
-    const src=document.getElementById('dragSrc');
-    src.setAttribute('draggable','true');
-    src.addEventListener('dragstart',e=>{ e.dataTransfer.setData('text/plain', 'scenario'); src.setAttribute('aria-grabbed','true'); });
-    src.addEventListener('dragend',()=> src.setAttribute('aria-grabbed','false'));
+    setupDragAndTouch();
+  }
 
-    document.querySelectorAll('.tile').forEach(tile=>{
-      tile.addEventListener('dragover',e=>{ e.preventDefault(); tile.style.borderColor='#667eea'; });
-      tile.addEventListener('dragleave',()=>{ tile.style.borderColor='transparent'; });
-      tile.addEventListener('drop',e=>{ e.preventDefault(); tile.style.borderColor='transparent'; handleChoice(tile.getAttribute('data-name')); });
-      tile.addEventListener('click',()=> handleChoice(tile.getAttribute('data-name')));
-      tile.addEventListener('keydown',e=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); handleChoice(tile.getAttribute('data-name')); }});
+  function setupDragAndTouch(){
+    const src=document.getElementById('dragSrc');
+    
+    // Mouse drag events
+    src.setAttribute('draggable','true');
+    src.addEventListener('dragstart',e=>{ 
+      e.dataTransfer.setData('text/plain', 'scenario'); 
+      src.setAttribute('aria-grabbed','true');
+      src.classList.add('dragging');
+    });
+    src.addEventListener('dragend',()=> {
+      src.setAttribute('aria-grabbed','false');
+      src.classList.remove('dragging');
     });
 
-    // keyboard 1–5
+    // Touch events for mobile
+    let touchTarget = null;
+    src.addEventListener('touchstart', e => {
+      src.classList.add('dragging');
+      state.touchStartY = e.touches[0].clientY;
+    }, {passive: true});
+
+    src.addEventListener('touchmove', e => {
+      const touch = e.touches[0];
+      const element = document.elementFromPoint(touch.clientX, touch.clientY);
+      
+      // Remove previous over state
+      document.querySelectorAll('.tile.over').forEach(t => t.classList.remove('over'));
+      
+      // Add over state to current target
+      if(element && element.classList.contains('tile')){
+        touchTarget = element;
+        touchTarget.classList.add('over');
+      } else if(element && element.closest('.tile')){
+        touchTarget = element.closest('.tile');
+        touchTarget.classList.add('over');
+      }
+    }, {passive: true});
+
+    src.addEventListener('touchend', e => {
+      src.classList.remove('dragging');
+      document.querySelectorAll('.tile.over').forEach(t => t.classList.remove('over'));
+      
+      if(touchTarget){
+        handleChoice(touchTarget.getAttribute('data-name'));
+        touchTarget = null;
+      }
+    });
+
+    // Tile events
+    document.querySelectorAll('.tile').forEach(tile=>{
+      // Desktop drag
+      tile.addEventListener('dragover',e=>{ e.preventDefault(); tile.classList.add('over'); });
+      tile.addEventListener('dragleave',()=>{ tile.classList.remove('over'); });
+      tile.addEventListener('drop',e=>{ 
+        e.preventDefault(); 
+        tile.classList.remove('over'); 
+        handleChoice(tile.getAttribute('data-name')); 
+      });
+      
+      // Click/tap
+      tile.addEventListener('click',()=> handleChoice(tile.getAttribute('data-name')));
+      tile.addEventListener('keydown',e=>{ 
+        if(e.key==='Enter' || e.key===' '){ 
+          e.preventDefault(); 
+          handleChoice(tile.getAttribute('data-name')); 
+        }
+      });
+    });
+
+    // Keyboard 1–5
     window.onkeydown=e=>{
       if(['1','2','3','4','5'].includes(e.key)){
-        const idx=parseInt(e.key,10)-1; const t=document.querySelectorAll('.tile')[idx]; if(t) handleChoice(t.getAttribute('data-name'));
+        const idx=parseInt(e.key,10)-1; 
+        const t=document.querySelectorAll('.tile')[idx]; 
+        if(t) handleChoice(t.getAttribute('data-name'));
       }
     };
   }
@@ -442,7 +540,9 @@
 
   function updateProgress(){
     const pct=Math.round(((state.qIndex+1)/state.total)*100);
-    const bar=document.getElementById('bar');bar.style.width=pct+'%';bar.textContent=`Question ${state.qIndex+1} of ${state.total}`;
+    const bar=document.getElementById('bar');
+    bar.style.width=pct+'%';
+    bar.textContent=`Question ${state.qIndex+1} of ${state.total}`;
   }
 
   function next(){
@@ -462,18 +562,43 @@
   const AUTO_CLOSE_MS=8000;
   function showFeedback(ok,msg,explain){
     return new Promise(resolve=>{
-      const o=document.getElementById('overlay'), box=document.getElementById('fbox'), close=document.getElementById('closex'), count=document.getElementById('count');
+      const o=document.getElementById('overlay'), 
+            box=document.getElementById('fbox'), 
+            close=document.getElementById('closex'), 
+            count=document.getElementById('count');
+      
       box.className='fbox '+(ok?'correct':'incorrect');
       document.getElementById('ficon').textContent=ok?'✓':'✗';
-      document.getElementById('fmsg').textContent=msg; document.getElementById('explain').textContent=explain||'';
-      let remaining = Math.floor(AUTO_CLOSE_MS/1000); count.textContent=remaining;
+      document.getElementById('fmsg').textContent=msg; 
+      document.getElementById('explain').textContent=explain||'';
+      
+      let remaining = Math.floor(AUTO_CLOSE_MS/1000); 
+      count.textContent=remaining;
       o.classList.add('show');
-      const tick=setInterval(()=>{ remaining--; if(remaining>=0) count.textContent=remaining; },1000);
-      const cleanup=()=>{ clearInterval(tick); o.classList.remove('show'); o.removeEventListener('click',outside); close.removeEventListener('click',onClose); document.removeEventListener('keydown',onEsc); clearTimeout(timer); resolve(); };
+      
+      const tick=setInterval(()=>{ 
+        remaining--; 
+        if(remaining>=0) count.textContent=remaining; 
+      },1000);
+      
+      const cleanup=()=>{ 
+        clearInterval(tick); 
+        o.classList.remove('show'); 
+        o.removeEventListener('click',outside); 
+        close.removeEventListener('click',onClose); 
+        document.removeEventListener('keydown',onEsc); 
+        clearTimeout(timer); 
+        resolve(); 
+      };
+      
       const outside=e=>{ if(e.target===o) cleanup(); };
       const onClose=()=>cleanup();
       const onEsc=e=>{ if(e.key==='Escape') cleanup(); };
-      o.addEventListener('click',outside); close.addEventListener('click',onClose); document.addEventListener('keydown',onEsc);
+      
+      o.addEventListener('click',outside); 
+      close.addEventListener('click',onClose); 
+      document.addEventListener('keydown',onEsc);
+      
       const timer=setTimeout(()=>cleanup(),AUTO_CLOSE_MS);
     });
   }
